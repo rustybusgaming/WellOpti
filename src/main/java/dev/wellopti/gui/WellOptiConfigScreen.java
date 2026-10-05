@@ -36,6 +36,8 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		WellOptiConfig.OcclusionCulling occlusion = cfg.occlusionCulling;
 		WellOptiConfig.BackgroundAudio audio = cfg.backgroundAudio;
 		WellOptiConfig.Hud hud = cfg.hud;
+		WellOptiConfig.Mobs mobs = cfg.mobs;
+		WellOptiConfig.Adaptive adaptive = cfg.adaptive;
 
 		this.list.addHeader(Component.translatable("wellopti.options.presets"));
 		List<AbstractWidget> presetButtons = new ArrayList<>();
@@ -72,7 +74,19 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			distance("wellopti.options.entityCulling.itemFrames", entities.itemFrames, v -> entities.itemFrames = v),
 			distance("wellopti.options.entityCulling.armorStands", entities.armorStands, v -> entities.armorStands = v),
 			distance("wellopti.options.entityCulling.stuckArrows", entities.stuckArrows, v -> entities.stuckArrows = v),
-			distance("wellopti.options.entityCulling.ambientMobs", entities.ambientMobs, v -> entities.ambientMobs = v)
+			distance("wellopti.options.entityCulling.ambientMobs", entities.ambientMobs, v -> entities.ambientMobs = v),
+			distance("wellopti.options.entityCulling.passiveMobs", entities.passiveMobs, v -> entities.passiveMobs = v),
+			distance("wellopti.options.entityCulling.villagers", entities.villagers, v -> entities.villagers = v),
+			distance("wellopti.options.entityCulling.hostileMobs", entities.hostileMobs, v -> entities.hostileMobs = v)
+		);
+
+		this.list.addHeader(Component.translatable("wellopti.options.mobs"));
+		this.list.addSmall(
+			distance("wellopti.options.mobs.equipmentDistance", mobs.equipmentDistance, v -> mobs.equipmentDistance = v),
+			slider("wellopti.options.mobs.nameTagDistance", 0, 16, 4, mobs.nameTagDistance, v -> mobs.nameTagDistance = v, WellOptiConfigScreen::blocksLabel),
+			slider("wellopti.options.mobs.crowdLimit", 0, 32, 1, mobs.crowdLimit, v -> mobs.crowdLimit = v, (caption, v) -> v == 0
+				? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF)
+				: Options.genericValueLabel(caption, Component.translatable("wellopti.options.perBlock", v)))
 		);
 
 		this.list.addHeader(Component.translatable("wellopti.options.blockEntityCulling"));
@@ -85,7 +99,8 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			distance("wellopti.options.blockEntityCulling.banners", blockEntities.banners, v -> blockEntities.banners = v),
 			distance("wellopti.options.blockEntityCulling.skulls", blockEntities.skulls, v -> blockEntities.skulls = v),
 			distance("wellopti.options.blockEntityCulling.storage", blockEntities.storage, v -> blockEntities.storage = v),
-			distance("wellopti.options.blockEntityCulling.itemDisplays", blockEntities.itemDisplays, v -> blockEntities.itemDisplays = v)
+			distance("wellopti.options.blockEntityCulling.itemDisplays", blockEntities.itemDisplays, v -> blockEntities.itemDisplays = v),
+			distance("wellopti.options.blockEntityCulling.spawners", blockEntities.spawners, v -> blockEntities.spawners = v)
 		);
 
 		this.list.addHeader(Component.translatable("wellopti.options.particles"));
@@ -93,6 +108,14 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			toggle("wellopti.options.particles.enabled", particles.enabled, v -> particles.enabled = v),
 			slider("wellopti.options.particles.max", 0, 40, 500, particles.maxParticles, v -> particles.maxParticles = v,
 				(caption, v) -> v == 0 ? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF) : Options.genericValueLabel(caption, v))
+		);
+
+		this.list.addHeader(Component.translatable("wellopti.options.adaptive"));
+		this.list.addBig(toggle("wellopti.options.adaptive.enabled", adaptive.enabled, v -> adaptive.enabled = v));
+		this.list.addSmall(
+			slider("wellopti.options.adaptive.targetFps", 1, 26, 10, adaptive.targetFps, v -> adaptive.targetFps = v, WellOptiConfigScreen::fpsLabel),
+			slider("wellopti.options.adaptive.minScale", 2, 20, 5, adaptive.minScale, v -> adaptive.minScale = v,
+				(caption, v) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.percent", v)))
 		);
 
 		this.list.addHeader(Component.translatable("wellopti.options.backgroundAudio"));
@@ -135,9 +158,13 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 
 	/** Distance slider from 0 to 128 blocks in steps of 4, where 0 means "never cull". */
 	private static OptionInstance<Integer> distance(String key, int initial, IntConsumer setter) {
-		return slider(key, 0, 32, 4, initial, setter, (caption, v) -> v == 0
+		return slider(key, 0, 32, 4, initial, setter, WellOptiConfigScreen::blocksLabel);
+	}
+
+	private static Component blocksLabel(Component caption, int value) {
+		return value == 0
 			? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF)
-			: Options.genericValueLabel(caption, Component.translatable("wellopti.options.blocks", v)));
+			: Options.genericValueLabel(caption, Component.translatable("wellopti.options.blocks", value));
 	}
 
 	private static OptionInstance<Integer> volume(String key, int initial, IntConsumer setter) {

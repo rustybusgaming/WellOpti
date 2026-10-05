@@ -27,6 +27,8 @@ public final class WellOptiConfig {
 	public OcclusionCulling occlusionCulling = new OcclusionCulling();
 	public BackgroundAudio backgroundAudio = new BackgroundAudio();
 	public Hud hud = new Hud();
+	public Mobs mobs = new Mobs();
+	public Adaptive adaptive = new Adaptive();
 
 	public static final class DynamicFps {
 		/** Lower the frame rate when the game window isn't focused or is minimised. */
@@ -51,6 +53,12 @@ public final class WellOptiConfig {
 		public int stuckArrows = 24;
 		/** Bats, fish, tadpoles and squid. */
 		public int ambientMobs = 48;
+		/** Cows, sheep, pigs, chickens, horses and other animals. */
+		public int passiveMobs = 48;
+		/** Villagers and wandering traders. */
+		public int villagers = 48;
+		/** Zombies, skeletons, creepers and other monsters. Bosses are never culled. */
+		public int hostileMobs = 64;
 	}
 
 	public static final class BlockEntityCulling {
@@ -64,6 +72,8 @@ public final class WellOptiConfig {
 		public int storage = 48;
 		/** Shelves, campfires and decorated pots. */
 		public int itemDisplays = 32;
+		/** Monster spawners (which spin a little mob inside), trial spawners and vaults. */
+		public int spawners = 32;
 	}
 
 	public static final class Particles {
@@ -92,6 +102,26 @@ public final class WellOptiConfig {
 		public HudCorner corner = HudCorner.TOP_LEFT;
 		public boolean showMemory = true;
 		public boolean showCulling = true;
+	}
+
+	public static final class Mobs {
+		/** Past this distance, mobs skip drawing armor, held items, elytra and heads. 0 always draws them. */
+		public int equipmentDistance = 32;
+		/** Past this distance, name tags on mobs aren't drawn (vanilla: 64). Players' name tags are left alone. */
+		public int nameTagDistance = 32;
+		/**
+		 * At most this many mobs are drawn per block. Mob farms cram dozens of animals into one block,
+		 * where you can't tell 8 from 80 anyway. 0 draws them all.
+		 */
+		public int crowdLimit = 8;
+	}
+
+	public static final class Adaptive {
+		/** Shrink culling distances automatically while FPS is below the target, and grow them back once it recovers. */
+		public boolean enabled = false;
+		public int targetFps = 60;
+		/** The furthest distances can shrink, in percent of their normal value. */
+		public int minScale = 50;
 	}
 
 	public enum HudCorner {
@@ -147,6 +177,8 @@ public final class WellOptiConfig {
 		if (backgroundAudio == null) backgroundAudio = new BackgroundAudio();
 		if (hud == null) hud = new Hud();
 		if (hud.corner == null) hud.corner = HudCorner.TOP_LEFT;
+		if (mobs == null) mobs = new Mobs();
+		if (adaptive == null) adaptive = new Adaptive();
 
 		dynamicFps.unfocusedFps = clamp(dynamicFps.unfocusedFps, 1, 260);
 		dynamicFps.minimizedFps = clamp(dynamicFps.minimizedFps, 1, 260);
@@ -158,12 +190,23 @@ public final class WellOptiConfig {
 		entityCulling.armorStands = clamp(entityCulling.armorStands, 0, 1024);
 		entityCulling.stuckArrows = clamp(entityCulling.stuckArrows, 0, 1024);
 		entityCulling.ambientMobs = clamp(entityCulling.ambientMobs, 0, 1024);
+		entityCulling.passiveMobs = clamp(entityCulling.passiveMobs, 0, 1024);
+		entityCulling.villagers = clamp(entityCulling.villagers, 0, 1024);
+		entityCulling.hostileMobs = clamp(entityCulling.hostileMobs, 0, 1024);
 
 		blockEntityCulling.signText = clamp(blockEntityCulling.signText, 0, 1024);
 		blockEntityCulling.banners = clamp(blockEntityCulling.banners, 0, 1024);
 		blockEntityCulling.skulls = clamp(blockEntityCulling.skulls, 0, 1024);
 		blockEntityCulling.storage = clamp(blockEntityCulling.storage, 0, 1024);
 		blockEntityCulling.itemDisplays = clamp(blockEntityCulling.itemDisplays, 0, 1024);
+		blockEntityCulling.spawners = clamp(blockEntityCulling.spawners, 0, 1024);
+
+		mobs.equipmentDistance = clamp(mobs.equipmentDistance, 0, 1024);
+		mobs.nameTagDistance = clamp(mobs.nameTagDistance, 0, 64);
+		mobs.crowdLimit = clamp(mobs.crowdLimit, 0, 1024);
+
+		adaptive.targetFps = clamp(adaptive.targetFps, 10, 260);
+		adaptive.minScale = clamp(adaptive.minScale, 10, 100);
 
 		particles.maxParticles = clamp(particles.maxParticles, 0, 65536);
 

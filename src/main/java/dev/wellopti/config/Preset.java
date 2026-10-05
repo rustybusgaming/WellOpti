@@ -7,50 +7,52 @@ import java.util.Locale;
  * Applying a preset turns every optimisation on and sets its distances; audio and HUD settings are left alone.
  */
 public enum Preset {
-	//            items xp frames stands arrows ambient | signs banners skulls storage displays | particles | unfocused minimised paused
-	QUALITY(      64,   48, 64,    96,    48,    64,      48,   64,     48,    64,     48,        8000,       60,       5,        60),
-	BALANCED(     48,   32, 48,    64,    24,    48,      24,   48,     32,    48,     32,        4000,       30,       3,        60),
-	PERFORMANCE(  32,   24, 32,    48,    16,    32,      16,   32,     24,    32,     24,        2000,       20,       1,        30),
-	POTATO(       24,   16, 24,    32,    12,    24,      12,   24,     16,    24,     16,        1000,       10,       1,        20);
+	QUALITY {
+		@Override
+		void configure(WellOptiConfig cfg) {
+			entities(cfg, 64, 48, 64, 96, 48, 64, 64, 64, 96);
+			blockEntities(cfg, 48, 64, 48, 64, 48, 48);
+			mobs(cfg, 48, 48, 16);
+			cfg.particles.maxParticles = 8000;
+			fps(cfg, 60, 5, 60);
+			adaptive(cfg, false, 60, 75);
+		}
+	},
+	BALANCED {
+		@Override
+		void configure(WellOptiConfig cfg) {
+			entities(cfg, 48, 32, 48, 64, 24, 48, 48, 48, 64);
+			blockEntities(cfg, 24, 48, 32, 48, 32, 32);
+			mobs(cfg, 32, 32, 8);
+			cfg.particles.maxParticles = 4000;
+			fps(cfg, 30, 3, 60);
+			adaptive(cfg, false, 60, 50);
+		}
+	},
+	PERFORMANCE {
+		@Override
+		void configure(WellOptiConfig cfg) {
+			entities(cfg, 32, 24, 32, 48, 16, 32, 32, 32, 48);
+			blockEntities(cfg, 16, 32, 24, 32, 24, 24);
+			mobs(cfg, 24, 24, 4);
+			cfg.particles.maxParticles = 2000;
+			fps(cfg, 20, 1, 30);
+			adaptive(cfg, true, 60, 50);
+		}
+	},
+	POTATO {
+		@Override
+		void configure(WellOptiConfig cfg) {
+			entities(cfg, 24, 16, 24, 32, 12, 24, 24, 24, 32);
+			blockEntities(cfg, 12, 24, 16, 24, 16, 16);
+			mobs(cfg, 16, 16, 2);
+			cfg.particles.maxParticles = 1000;
+			fps(cfg, 10, 1, 20);
+			adaptive(cfg, true, 30, 40);
+		}
+	};
 
-	private final int droppedItems;
-	private final int experienceOrbs;
-	private final int itemFrames;
-	private final int armorStands;
-	private final int stuckArrows;
-	private final int ambientMobs;
-	private final int signText;
-	private final int banners;
-	private final int skulls;
-	private final int storage;
-	private final int itemDisplays;
-	private final int maxParticles;
-	private final int unfocusedFps;
-	private final int minimizedFps;
-	private final int pausedFps;
-
-	Preset(
-		int droppedItems, int experienceOrbs, int itemFrames, int armorStands, int stuckArrows, int ambientMobs,
-		int signText, int banners, int skulls, int storage, int itemDisplays,
-		int maxParticles,
-		int unfocusedFps, int minimizedFps, int pausedFps
-	) {
-		this.droppedItems = droppedItems;
-		this.experienceOrbs = experienceOrbs;
-		this.itemFrames = itemFrames;
-		this.armorStands = armorStands;
-		this.stuckArrows = stuckArrows;
-		this.ambientMobs = ambientMobs;
-		this.signText = signText;
-		this.banners = banners;
-		this.skulls = skulls;
-		this.storage = storage;
-		this.itemDisplays = itemDisplays;
-		this.maxParticles = maxParticles;
-		this.unfocusedFps = unfocusedFps;
-		this.minimizedFps = minimizedFps;
-		this.pausedFps = pausedFps;
-	}
+	abstract void configure(WellOptiConfig cfg);
 
 	public String id() {
 		return name().toLowerCase(Locale.ROOT);
@@ -62,30 +64,55 @@ public enum Preset {
 
 	public void applyTo(WellOptiConfig cfg) {
 		cfg.dynamicFps.enabled = true;
-		cfg.dynamicFps.unfocusedFps = unfocusedFps;
-		cfg.dynamicFps.minimizedFps = minimizedFps;
-		cfg.dynamicFps.pausedFps = pausedFps;
-
 		cfg.entityCulling.enabled = true;
-		cfg.entityCulling.droppedItems = droppedItems;
-		cfg.entityCulling.experienceOrbs = experienceOrbs;
-		cfg.entityCulling.itemFrames = itemFrames;
-		cfg.entityCulling.armorStands = armorStands;
-		cfg.entityCulling.stuckArrows = stuckArrows;
-		cfg.entityCulling.ambientMobs = ambientMobs;
-
 		cfg.blockEntityCulling.enabled = true;
-		cfg.blockEntityCulling.signText = signText;
-		cfg.blockEntityCulling.banners = banners;
-		cfg.blockEntityCulling.skulls = skulls;
-		cfg.blockEntityCulling.storage = storage;
-		cfg.blockEntityCulling.itemDisplays = itemDisplays;
-
 		cfg.particles.enabled = true;
-		cfg.particles.maxParticles = maxParticles;
-
 		cfg.occlusionCulling.enabled = true;
 		cfg.occlusionCulling.entities = true;
 		cfg.occlusionCulling.blockEntities = true;
+		configure(cfg);
+	}
+
+	private static void entities(
+		WellOptiConfig cfg, int items, int xp, int frames, int stands, int arrows, int ambient, int passive, int villagers, int hostile
+	) {
+		WellOptiConfig.EntityCulling e = cfg.entityCulling;
+		e.droppedItems = items;
+		e.experienceOrbs = xp;
+		e.itemFrames = frames;
+		e.armorStands = stands;
+		e.stuckArrows = arrows;
+		e.ambientMobs = ambient;
+		e.passiveMobs = passive;
+		e.villagers = villagers;
+		e.hostileMobs = hostile;
+	}
+
+	private static void blockEntities(WellOptiConfig cfg, int signs, int banners, int skulls, int storage, int displays, int spawners) {
+		WellOptiConfig.BlockEntityCulling b = cfg.blockEntityCulling;
+		b.signText = signs;
+		b.banners = banners;
+		b.skulls = skulls;
+		b.storage = storage;
+		b.itemDisplays = displays;
+		b.spawners = spawners;
+	}
+
+	private static void mobs(WellOptiConfig cfg, int equipment, int nameTags, int crowd) {
+		cfg.mobs.equipmentDistance = equipment;
+		cfg.mobs.nameTagDistance = nameTags;
+		cfg.mobs.crowdLimit = crowd;
+	}
+
+	private static void fps(WellOptiConfig cfg, int unfocused, int minimized, int paused) {
+		cfg.dynamicFps.unfocusedFps = unfocused;
+		cfg.dynamicFps.minimizedFps = minimized;
+		cfg.dynamicFps.pausedFps = paused;
+	}
+
+	private static void adaptive(WellOptiConfig cfg, boolean enabled, int targetFps, int minScale) {
+		cfg.adaptive.enabled = enabled;
+		cfg.adaptive.targetFps = targetFps;
+		cfg.adaptive.minScale = minScale;
 	}
 }

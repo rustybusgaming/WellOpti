@@ -6,7 +6,10 @@
 		"AbstractArrowAccessor",
 		"BlockEntityRenderDispatcherMixin",
 		"EntityRenderDispatcherMixin",
+		"EntityRendererMixin",
 		"FramerateLimitTrackerMixin",
+		"LevelExtractorMixin",
+		"LivingEntityRendererMixin",
 		"ParticleEngineMixin",
 		"SoundEngineMixin"
 	],

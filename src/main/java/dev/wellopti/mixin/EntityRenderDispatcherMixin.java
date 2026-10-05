@@ -20,12 +20,15 @@ public abstract class EntityRenderDispatcherMixin {
 		}
 	}
 
-	/** Runs after vanilla's view-cone check, so we only raycast for entities that would otherwise be drawn. */
+	/**
+	 * Runs after vanilla's view-cone check, so we only raycast for entities that would otherwise be drawn.
+	 * The crowd limit goes last so it only counts mobs that really are about to be drawn.
+	 */
 	@Inject(method = "shouldRender", at = @At("RETURN"), cancellable = true)
-	private void wellopti$cullOccludedEntities(
+	private void wellopti$cullOccludedAndCrowdedEntities(
 		Entity entity, Frustum culler, double camX, double camY, double camZ, float partialTicks, CallbackInfoReturnable<Boolean> cir
 	) {
-		if (cir.getReturnValueZ() && Culling.isEntityOccluded(entity, camX, camY, camZ)) {
+		if (cir.getReturnValueZ() && (Culling.isEntityOccluded(entity, camX, camY, camZ) || Culling.isOverCrowdLimit(entity))) {
 			cir.setReturnValue(false);
 		}
 	}

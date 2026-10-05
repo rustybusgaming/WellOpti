@@ -6,6 +6,16 @@ import dev.wellopti.occlusion.OcclusionCuller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
+import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
@@ -33,7 +43,48 @@ import net.minecraft.world.phys.Vec3;
  * the game still ticks these objects, we just skip building and submitting their geometry.
  */
 public final class Culling {
+	/** Mobs drawn so far this frame in each block, for the crowd limit. */
+	private static final Long2IntOpenHashMap CROWD = new Long2IntOpenHashMap();
+
 	private Culling() {
+	}
+
+	/** Called at the start of each frame's entity pass. */
+	public static void beginFrame() {
+		CROWD.clear();
+	}
+
+	/**
+	 * Crowd limit: in a mob farm with 80 chickens in one block you can't tell 8 from 80, so stop drawing after N.
+	 * Must run last, after every other check has decided the mob would be drawn.
+	 */
+	public static boolean isOverCrowdLimit(Entity entity) {
+		int limit = WellOptiConfig.get().mobs.crowdLimit;
+		if (limit <= 0 || !WellOptiClient.active || !(entity instanceof LivingEntity) || entity instanceof Player || isBoss(entity)) {
+			return false;
+		}
+
+		int drawn = CROWD.addTo(entity.blockPosition().asLong(), 1);
+		if (drawn >= limit) {
+			WellOptiStats.crowded++;
+			return true;
+		}
+		return false;
+	}
+
+	/** Far-away mobs skip their equipment layers (armor, held items, elytra, heads). Players always keep theirs. */
+	public static boolean shouldSkipEquipment(double distanceToCameraSq, boolean isPlayer) {
+		int limit = WellOptiConfig.get().mobs.equipmentDistance;
+		return limit > 0 && WellOptiClient.active && !isPlayer && beyond(distanceToCameraSq, limit);
+	}
+
+	/** Name tag distance for mobs; players keep vanilla's 64 blocks. */
+	public static double nameTagDistance(Entity entity, double vanillaDistance) {
+		int limit = WellOptiConfig.get().mobs.nameTagDistance;
+		if (limit <= 0 || !WellOptiClient.active || entity instanceof Player) {
+			return vanillaDistance;
+		}
+		return Math.min(vanillaDistance, limit * AdaptiveDistance.scale());
 	}
 
 	public static boolean shouldCullEntity(Entity entity, double camX, double camY, double camZ) {
@@ -120,6 +171,10 @@ public final class Culling {
 		if (entity instanceof ArmorStand) return cfg.armorStands;
 		if (entity instanceof AbstractArrow arrow) return ((AbstractArrowAccessor) arrow).wellopti$isInGround() ? cfg.stuckArrows : 0;
 		if (entity instanceof AmbientCreature || entity instanceof AbstractFish || entity instanceof Squid) return cfg.ambientMobs;
+		if (entity instanceof Player || isBoss(entity) || entity.hasCustomName()) return 0;
+		if (entity instanceof AbstractVillager) return cfg.villagers;
+		if (entity instanceof Enemy) return cfg.hostileMobs;
+		if (entity instanceof Animal) return cfg.passiveMobs;
 		return 0;
 	}
 
@@ -132,7 +187,14 @@ public final class Culling {
 		if (blockEntity instanceof ShelfBlockEntity || blockEntity instanceof CampfireBlockEntity || blockEntity instanceof DecoratedPotBlockEntity) {
 			return cfg.itemDisplays;
 		}
+		if (blockEntity instanceof SpawnerBlockEntity || blockEntity instanceof TrialSpawnerBlockEntity || blockEntity instanceof VaultBlockEntity) {
+			return cfg.spawners;
+		}
 		return 0;
+	}
+
+	private static boolean isBoss(Entity entity) {
+		return entity instanceof EnderDragon || entity instanceof WitherBoss;
 	}
 
 	private static boolean isScoping() {
@@ -140,8 +202,9 @@ public final class Culling {
 		return player != null && player.isScoping();
 	}
 
-	/** True when something {@code distanceSqr} away is beyond {@code limit} blocks. */
+	/** True when something {@code distanceSqr} away is beyond {@code limit} blocks, after adaptive mode's scaling. */
 	private static boolean beyond(double distanceSqr, int limit) {
-		return distanceSqr > (double) limit * limit;
+		double scaled = limit * AdaptiveDistance.scale();
+		return distanceSqr > scaled * scaled;
 	}
 }

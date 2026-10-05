@@ -1,5 +1,6 @@
 package dev.wellopti.hud;
 
+import dev.wellopti.AdaptiveDistance;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.WellOptiStats;
 import dev.wellopti.config.WellOptiConfig;
@@ -54,7 +55,13 @@ public final class PerformanceHud implements HudElement {
 			lines.add(new Line(String.format(" %d far entities", WellOptiStats.entitiesPerSecond() / frames), TEXT));
 			lines.add(new Line(String.format(" %d far block entities", WellOptiStats.blockEntitiesPerSecond() / frames), TEXT));
 			lines.add(new Line(String.format(" %d hidden behind walls", WellOptiStats.occludedPerSecond() / frames), TEXT));
+			lines.add(new Line(String.format(" %d crowded mobs", WellOptiStats.crowdedPerSecond() / frames), TEXT));
 			lines.add(new Line(String.format(" %d particles/s blocked", WellOptiStats.particlesPerSecond()), TEXT));
+		}
+
+		if (WellOptiConfig.get().adaptive.enabled) {
+			int percent = Math.round(AdaptiveDistance.scale() * 100);
+			lines.add(new Line("Adaptive: " + percent + "% distance", percent >= 100 ? GOOD : percent >= 75 ? OK : BAD));
 		}
 
 		Font font = minecraft.font;

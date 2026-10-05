@@ -29,6 +29,10 @@ class WellOptiConfigTest {
 			assertLessOrEqual(heavier.blockEntityCulling.storage, lighter.blockEntityCulling.storage, pair);
 			assertLessOrEqual(heavier.particles.maxParticles, lighter.particles.maxParticles, pair);
 			assertLessOrEqual(heavier.dynamicFps.unfocusedFps, lighter.dynamicFps.unfocusedFps, pair);
+			assertLessOrEqual(heavier.entityCulling.passiveMobs, lighter.entityCulling.passiveMobs, pair);
+			assertLessOrEqual(heavier.entityCulling.hostileMobs, lighter.entityCulling.hostileMobs, pair);
+			assertLessOrEqual(heavier.mobs.crowdLimit, lighter.mobs.crowdLimit, pair);
+			assertLessOrEqual(heavier.mobs.equipmentDistance, lighter.mobs.equipmentDistance, pair);
 		}
 	}
 
@@ -39,6 +43,8 @@ class WellOptiConfigTest {
 		assertNotNull(cfg.dynamicFps);
 		assertNotNull(cfg.occlusionCulling);
 		assertNotNull(cfg.hud.corner);
+		assertNotNull(cfg.mobs);
+		assertNotNull(cfg.adaptive);
 		assertEquals(123, cfg.particles.maxParticles);
 		assertEquals(false, cfg.particles.enabled);
 		assertEquals(new WellOptiConfig().entityCulling.droppedItems, cfg.entityCulling.droppedItems);
@@ -49,13 +55,17 @@ class WellOptiConfigTest {
 		WellOptiConfig cfg = GSON.fromJson(
 			"{\"dynamicFps\": {\"unfocusedFps\": -5, \"minimizedFps\": 9999},"
 				+ " \"entityCulling\": {\"droppedItems\": -1},"
-				+ " \"backgroundAudio\": {\"unfocusedVolume\": 250}}",
+				+ " \"backgroundAudio\": {\"unfocusedVolume\": 250},"
+				+ " \"mobs\": {\"nameTagDistance\": 500},"
+				+ " \"adaptive\": {\"minScale\": 0}}",
 			WellOptiConfig.class);
 		cfg.sanitize();
 		assertEquals(1, cfg.dynamicFps.unfocusedFps);
 		assertEquals(260, cfg.dynamicFps.minimizedFps);
 		assertEquals(0, cfg.entityCulling.droppedItems);
 		assertEquals(100, cfg.backgroundAudio.unfocusedVolume);
+		assertEquals(64, cfg.mobs.nameTagDistance, "can't exceed vanilla's own name tag range");
+		assertEquals(10, cfg.adaptive.minScale);
 	}
 
 	@Test

@@ -58,6 +58,7 @@ public class WellOptiClient implements ClientModInitializer {
 
 	private static void onEndTick(Minecraft minecraft) {
 		OcclusionCuller.tick(minecraft.level);
+		AdaptiveDistance.tick(minecraft);
 		WellOptiStats.tick();
 		BackgroundAudio.tick(minecraft);
 
@@ -106,11 +107,18 @@ public class WellOptiClient implements ClientModInitializer {
 				source.sendFeedback(line("Entity culling", cfg.entityCulling.enabled,
 					"items " + cfg.entityCulling.droppedItems + ", xp " + cfg.entityCulling.experienceOrbs
 						+ ", frames " + cfg.entityCulling.itemFrames + ", stands " + cfg.entityCulling.armorStands
-						+ ", arrows " + cfg.entityCulling.stuckArrows + ", ambient " + cfg.entityCulling.ambientMobs));
+						+ ", arrows " + cfg.entityCulling.stuckArrows + ", ambient " + cfg.entityCulling.ambientMobs
+						+ ", passive " + cfg.entityCulling.passiveMobs + ", villagers " + cfg.entityCulling.villagers
+						+ ", hostile " + cfg.entityCulling.hostileMobs));
 				source.sendFeedback(line("Block entity culling", cfg.blockEntityCulling.enabled,
 					"signs " + cfg.blockEntityCulling.signText + ", banners " + cfg.blockEntityCulling.banners
 						+ ", skulls " + cfg.blockEntityCulling.skulls + ", storage " + cfg.blockEntityCulling.storage
-						+ ", displays " + cfg.blockEntityCulling.itemDisplays));
+						+ ", displays " + cfg.blockEntityCulling.itemDisplays + ", spawners " + cfg.blockEntityCulling.spawners));
+				source.sendFeedback(Component.literal("Mob detail: equipment " + offIfZero(cfg.mobs.equipmentDistance)
+					+ ", name tags " + offIfZero(cfg.mobs.nameTagDistance) + ", crowd limit " + offIfZero(cfg.mobs.crowdLimit) + " per block")
+					.withStyle(ChatFormatting.GRAY));
+				source.sendFeedback(line("Adaptive", cfg.adaptive.enabled, "target " + cfg.adaptive.targetFps + " fps, now at "
+					+ Math.round(AdaptiveDistance.scale() * 100) + "% distance"));
 				source.sendFeedback(line("Particle cap", cfg.particles.enabled, offIfZero(cfg.particles.maxParticles) + " max"));
 				source.sendFeedback(line("Occlusion culling", cfg.occlusionCulling.enabled,
 					(cfg.occlusionCulling.entities ? "entities" : "") + (cfg.occlusionCulling.entities && cfg.occlusionCulling.blockEntities ? " + " : "")
@@ -142,8 +150,8 @@ public class WellOptiClient implements ClientModInitializer {
 				double[] s = WellOptiStats.sinceLastCommand();
 				ctx.getSource().sendFeedback(Component.literal(String.format(
 					"Over the last %.0fs WellOpti skipped %,.0f far entity draws, %,.0f far block entity draws, "
-						+ "%,.0f draws of things hidden behind walls, and %,.0f particles.",
-					s[4], s[0], s[1], s[2], s[3])));
+						+ "%,.0f draws of things hidden behind walls, %,.0f draws of crowded mobs, and %,.0f particles.",
+					s[5], s[0], s[1], s[2], s[4], s[3])));
 				return 1;
 			})));
 	}
