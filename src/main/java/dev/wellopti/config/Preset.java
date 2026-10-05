@@ -13,7 +13,7 @@ public enum Preset {
 			entities(cfg, 64, 48, 64, 96, 48, 64, 64, 64, 96);
 			blockEntities(cfg, 48, 64, 48, 64, 48, 48);
 			mobs(cfg, 48, 48, 16);
-			cfg.particles.maxParticles = 8000;
+			particles(cfg, 8000, 48, 100);
 			fps(cfg, 60, 5, 60);
 			adaptive(cfg, false, 60, 75);
 		}
@@ -24,7 +24,7 @@ public enum Preset {
 			entities(cfg, 48, 32, 48, 64, 24, 48, 48, 48, 64);
 			blockEntities(cfg, 24, 48, 32, 48, 32, 32);
 			mobs(cfg, 32, 32, 8);
-			cfg.particles.maxParticles = 4000;
+			particles(cfg, 4000, 32, 100);
 			fps(cfg, 30, 3, 60);
 			adaptive(cfg, false, 60, 50);
 		}
@@ -35,7 +35,7 @@ public enum Preset {
 			entities(cfg, 32, 24, 32, 48, 16, 32, 32, 32, 48);
 			blockEntities(cfg, 16, 32, 24, 32, 24, 24);
 			mobs(cfg, 24, 24, 4);
-			cfg.particles.maxParticles = 2000;
+			particles(cfg, 2000, 24, 75);
 			fps(cfg, 20, 1, 30);
 			adaptive(cfg, true, 60, 50);
 		}
@@ -46,7 +46,7 @@ public enum Preset {
 			entities(cfg, 24, 16, 24, 32, 12, 24, 24, 24, 32);
 			blockEntities(cfg, 12, 24, 16, 24, 16, 16);
 			mobs(cfg, 16, 16, 2);
-			cfg.particles.maxParticles = 1000;
+			particles(cfg, 1000, 16, 50);
 			fps(cfg, 10, 1, 20);
 			adaptive(cfg, true, 30, 40);
 		}
@@ -102,6 +102,12 @@ public enum Preset {
 		cfg.mobs.equipmentDistance = equipment;
 		cfg.mobs.nameTagDistance = nameTags;
 		cfg.mobs.crowdLimit = crowd;
+	}
+
+	private static void particles(WellOptiConfig cfg, int max, int ambientDistance, int ambientDensity) {
+		cfg.particles.maxParticles = max;
+		cfg.particles.ambientDistance = ambientDistance;
+		cfg.particles.ambientDensity = ambientDensity;
 	}
 
 	private static void fps(WellOptiConfig cfg, int unfocused, int minimized, int paused) {

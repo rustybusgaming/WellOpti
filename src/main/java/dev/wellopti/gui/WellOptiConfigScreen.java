@@ -2,6 +2,7 @@ package dev.wellopti.gui;
 
 import com.mojang.serialization.Codec;
 import dev.wellopti.WellOptiClient;
+import dev.wellopti.bench.Benchmark;
 import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
 import java.util.ArrayList;
@@ -47,6 +48,16 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 				.build());
 		}
 		this.list.addSmall(presetButtons);
+
+		Button benchmark = Button.builder(Component.translatable("wellopti.options.benchmark"), button -> {
+				this.onClose();
+				this.minecraft.gui.setScreen(null);
+				Benchmark.start(this.minecraft);
+			})
+			.tooltip(Tooltip.create(Component.translatable(this.minecraft.level == null ? "wellopti.options.benchmark.needWorld" : "wellopti.options.benchmark.tooltip")))
+			.build();
+		benchmark.active = this.minecraft.level != null && !Benchmark.isRunning();
+		this.list.addBig(benchmark);
 
 		this.list.addHeader(Component.translatable("wellopti.options.occlusionCulling"));
 		this.list.addBig(toggle("wellopti.options.occlusionCulling.enabled", occlusion.enabled, v -> occlusion.enabled = v));
@@ -107,7 +118,10 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		this.list.addSmall(
 			toggle("wellopti.options.particles.enabled", particles.enabled, v -> particles.enabled = v),
 			slider("wellopti.options.particles.max", 0, 40, 500, particles.maxParticles, v -> particles.maxParticles = v,
-				(caption, v) -> v == 0 ? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF) : Options.genericValueLabel(caption, v))
+				(caption, v) -> v == 0 ? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF) : Options.genericValueLabel(caption, v)),
+			distance("wellopti.options.particles.ambientDistance", particles.ambientDistance, v -> particles.ambientDistance = v),
+			slider("wellopti.options.particles.ambientDensity", 0, 20, 5, particles.ambientDensity, v -> particles.ambientDensity = v,
+				(caption, v) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.percent", v)))
 		);
 
 		this.list.addHeader(Component.translatable("wellopti.options.adaptive"));
@@ -138,6 +152,9 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			toggle("wellopti.options.hud.showMemory", hud.showMemory, v -> hud.showMemory = v),
 			toggle("wellopti.options.hud.showCulling", hud.showCulling, v -> hud.showCulling = v)
 		);
+
+		this.list.addHeader(Component.translatable("wellopti.options.misc"));
+		this.list.addSmall(toggle("wellopti.options.memoryAdvisor", cfg.memoryAdvisor, v -> cfg.memoryAdvisor = v));
 	}
 
 	/** Applies a preset, then rebuilds the screen so every slider shows its new value. */

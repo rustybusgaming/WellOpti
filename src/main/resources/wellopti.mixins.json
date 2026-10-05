@@ -10,6 +10,7 @@
 		"FramerateLimitTrackerMixin",
 		"LevelExtractorMixin",
 		"LivingEntityRendererMixin",
+		"MinecraftMixin",
 		"ParticleEngineMixin",
 		"SoundEngineMixin"
 	],

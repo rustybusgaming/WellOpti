@@ -30,6 +30,7 @@
 		"sources": "https://github.com/rustybusgaming/WellOpti"
 	},
 	"suggests": {
-		"modmenu": "*"
+		"modmenu": "*",
+		"sodium": "*"
 	}
 }

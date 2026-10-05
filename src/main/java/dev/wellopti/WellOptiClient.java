@@ -5,6 +5,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.wellopti.audio.BackgroundAudio;
+import dev.wellopti.bench.Benchmark;
 import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
 import dev.wellopti.gui.WellOptiConfigScreen;
@@ -15,6 +16,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
@@ -52,6 +54,7 @@ public class WellOptiClient implements ClientModInitializer {
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "performance_hud"), new PerformanceHud());
 		ClientTickEvents.END_CLIENT_TICK.register(WellOptiClient::onEndTick);
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> MemoryAdvisor.onJoin(minecraft));
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));
 		LOGGER.info("WellOpti loaded. Minecraft is now running very goodly.");
 	}
@@ -61,6 +64,8 @@ public class WellOptiClient implements ClientModInitializer {
 		AdaptiveDistance.tick(minecraft);
 		WellOptiStats.tick();
 		BackgroundAudio.tick(minecraft);
+		Benchmark.tick(minecraft);
+		MemoryAdvisor.tick(minecraft);
 
 		while (hudKey.consumeClick()) {
 			toggleHud(minecraft);
@@ -81,6 +86,12 @@ public class WellOptiClient implements ClientModInitializer {
 	}
 
 	private static void toggle(Minecraft minecraft) {
+		if (Benchmark.isRunning()) {
+			if (minecraft.player != null) {
+				minecraft.player.sendOverlayMessage(Component.translatable("wellopti.benchmark.noToggle").withStyle(ChatFormatting.RED));
+			}
+			return;
+		}
 		active = !active;
 		if (minecraft.player != null) {
 			minecraft.player.sendOverlayMessage(Component.translatable(active ? "wellopti.toggle.on" : "wellopti.toggle.off")
@@ -132,6 +143,15 @@ public class WellOptiClient implements ClientModInitializer {
 				openConfigNextTick = true;
 				return 1;
 			}))
+			.then(literal("benchmark")
+				.executes(ctx -> {
+					Benchmark.start(ctx.getSource().getClient());
+					return 1;
+				})
+				.then(literal("stop").executes(ctx -> {
+					Benchmark.stop(ctx.getSource().getClient(), Component.translatable("wellopti.benchmark.cancelled.manual"));
+					return 1;
+				})))
 			.then(literal("hud").executes(ctx -> {
 				toggleHud(ctx.getSource().getClient());
 				ctx.getSource().sendFeedback(Component.literal("Performance HUD " + (WellOptiConfig.get().hud.enabled ? "shown." : "hidden.")));

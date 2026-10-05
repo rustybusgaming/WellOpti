@@ -29,6 +29,8 @@ public final class WellOptiConfig {
 	public Hud hud = new Hud();
 	public Mobs mobs = new Mobs();
 	public Adaptive adaptive = new Adaptive();
+	/** Show a toast if the game has very little memory, or memory stays nearly full. */
+	public boolean memoryAdvisor = true;
 
 	public static final class DynamicFps {
 		/** Lower the frame rate when the game window isn't focused or is minimised. */
@@ -80,6 +82,13 @@ public final class WellOptiConfig {
 		public boolean enabled = true;
 		/** Hard cap on live particles; vanilla allows up to 16384 per render group. */
 		public int maxParticles = 4000;
+		/**
+		 * Ambient particles (campfire smoke, rain splashes, drips, spores, falling leaves, ash, bubble columns,
+		 * fireflies) aren't spawned further away than this. 0 turns this off.
+		 */
+		public int ambientDistance = 32;
+		/** Percentage of ambient particles that are spawned at all. */
+		public int ambientDensity = 100;
 	}
 
 	public static final class OcclusionCulling {
@@ -209,6 +218,8 @@ public final class WellOptiConfig {
 		adaptive.minScale = clamp(adaptive.minScale, 10, 100);
 
 		particles.maxParticles = clamp(particles.maxParticles, 0, 65536);
+		particles.ambientDistance = clamp(particles.ambientDistance, 0, 1024);
+		particles.ambientDensity = clamp(particles.ambientDensity, 0, 100);
 
 		backgroundAudio.unfocusedVolume = clamp(backgroundAudio.unfocusedVolume, 0, 100);
 		backgroundAudio.minimizedVolume = clamp(backgroundAudio.minimizedVolume, 0, 100);

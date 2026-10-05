@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import dev.wellopti.particle.AmbientParticles;
+import net.minecraft.core.particles.ParticleOptions;
 
 /** Stops explosions, farms and particle-spam plugins from flooding the particle engine. */
 @Mixin(ParticleEngine.class)
@@ -26,6 +29,17 @@ public abstract class ParticleEngineMixin {
 	@Shadow
 	@Final
 	private Queue<Particle> particlesToAdd;
+
+	/** Ambient particles go through here (not straight to add), so this is where we can see their type and position. */
+	@Inject(method = "createParticle", at = @At("HEAD"), cancellable = true)
+	private void wellopti$thinAmbientParticles(
+		ParticleOptions options, double x, double y, double z, double xa, double ya, double za, CallbackInfoReturnable<Particle> cir
+	) {
+		if (AmbientParticles.shouldSkip(options, x, y, z)) {
+			WellOptiStats.droppedParticles++;
+			cir.setReturnValue(null);
+		}
+	}
 
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
 	private void wellopti$capParticles(Particle particle, CallbackInfo ci) {
