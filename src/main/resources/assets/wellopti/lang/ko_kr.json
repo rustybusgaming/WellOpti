@@ -125,7 +125,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "게임이 사용 중인 Java 메모리 양을 표시합니다.",
 	"wellopti.options.hud.showCulling": "컬링 표시",
 	"wellopti.options.hud.showCulling.tooltip": "WellOpti가 프레임마다 그리지 않은 개수를 표시합니다.",
-	"wellopti.options.misc": "기타",
 	"wellopti.options.memoryAdvisor": "메모리 조언",
 	"wellopti.options.memoryAdvisor.tooltip": "Minecraft에 할당된 메모리가 아주 적거나, 메모리가 한동안 거의 가득 차 있을 때 짧은 알림을 표시합니다.",
 	"wellopti.memory.low.title": "Minecraft 메모리가 부족합니다",
@@ -145,5 +144,9 @@
 	"wellopti.benchmark.noToggle": "벤치마크 중에는 WellOpti를 켜거나 끌 수 없습니다",
 	"wellopti.benchmark.cancelled.manual": "벤치마크를 취소했습니다.",
 	"wellopti.benchmark.cancelled.leftWorld": "벤치마크를 취소했습니다: 월드를 나갔습니다.",
-	"wellopti.benchmark.cancelled.menu": "벤치마크를 취소했습니다: 메뉴가 열렸거나 창이 비활성화되어 FPS가 의도적으로 바뀌었습니다. 게임을 앞에 둔 채로 다시 시도하세요."
+	"wellopti.benchmark.cancelled.menu": "벤치마크를 취소했습니다: 메뉴가 열렸거나 창이 비활성화되어 FPS가 의도적으로 바뀌었습니다. 게임을 앞에 둔 채로 다시 시도하세요.",
+	"wellopti.options.memory": "메모리",
+	"wellopti.options.memory.cleanOnLeave": "월드를 나간 후 메모리 해제",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "월드를 나가면 WellOpti가 자체 캐시를 비우고, 나간 월드를 해제하도록 Java에 요청합니다. 짧은 멈춤이 상관없는 메뉴 화면에 있을 때 실행됩니다. 월드 사이의 메모리 사용량을 줄여 주지만 FPS를 올려 주지는 않습니다.",
+	"wellopti.benchmark.memory": "메모리 사용: WellOpti 사용 시 %s MB/s, 가비지 컬렉션 %s ms / 미사용 시 %s MB/s, %s ms (낮을수록 끊김이 적습니다)"
 }

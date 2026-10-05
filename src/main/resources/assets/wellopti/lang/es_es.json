@@ -116,7 +116,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "Muestra cuánta memoria de Java está usando el juego.",
 	"wellopti.options.hud.showCulling": "Mostrar culling",
 	"wellopti.options.hud.showCulling.tooltip": "Muestra cuántas cosas dejó de dibujar WellOpti en cada fotograma.",
-	"wellopti.options.misc": "Otros",
 	"wellopti.options.memoryAdvisor": "Avisos de memoria",
 	"wellopti.options.memoryAdvisor.tooltip": "Muestra un aviso breve si Minecraft tiene muy poca memoria asignada o si la memoria se mantiene casi llena durante un rato.",
 	"wellopti.memory.low.title": "Minecraft tiene poca memoria",
@@ -145,5 +144,9 @@
 	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Las entidades que WellOpti no dibuja (tras una pared, demasiado lejos o por encima del límite de multitud de una granja) se actualizan 5 veces por segundo en tu pantalla en lugar de 20. En cuanto vuelven a verse, se ponen al día. El servidor sigue ejecutando cada criatura con normalidad, así que las granjas y el juego no cambian. Los jugadores, lo que alguien monta y las entidades cercanas siempre se actualizan con normalidad.",
 	"wellopti.options.perServerPresets": "Recordar preajuste por servidor",
 	"wellopti.options.perServerPresets.tooltip": "Cuando eliges un preajuste mientras juegas, WellOpti lo recuerda para ese servidor (el modo individual cuenta como uno) y vuelve a él cada vez que entras allí.",
-	"wellopti.preset.restored": "WellOpti: usando el preajuste %s en este servidor"
+	"wellopti.preset.restored": "WellOpti: usando el preajuste %s en este servidor",
+	"wellopti.options.memory": "Memoria",
+	"wellopti.options.memory.cleanOnLeave": "Liberar memoria al salir",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "Al salir de un mundo, WellOpti descarta sus cachés y pide a Java que libere el mundo que dejaste, mientras estás en el menú, donde una pausa breve no importa. Reduce el uso de memoria entre mundos; no aumenta los FPS.",
+	"wellopti.benchmark.memory": "Uso de memoria: %s MB/s y %s ms de recolección de basura con WellOpti; %s MB/s y %s ms sin él (menos significa menos tirones)"
 }

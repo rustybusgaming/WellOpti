@@ -31,6 +31,7 @@ public final class WellOptiConfig {
 	public Hud hud = new Hud();
 	public Mobs mobs = new Mobs();
 	public Adaptive adaptive = new Adaptive();
+	public Memory memory = new Memory();
 	/** Show a toast if the game has very little memory, or memory stays nearly full. */
 	public boolean memoryAdvisor = true;
 	/** Remember the preset picked on each server (and in singleplayer) and switch to it when you join. */
@@ -136,6 +137,11 @@ public final class WellOptiConfig {
 		public int crowdLimit = 8;
 	}
 
+	public static final class Memory {
+		/** After leaving a world, drop WellOpti's caches and ask Java to free the world you left. */
+		public boolean cleanOnLeave = true;
+	}
+
 	public static final class Adaptive {
 		/** Shrink culling distances automatically while FPS is below the target, and grow them back once it recovers. */
 		public boolean enabled = false;
@@ -199,6 +205,7 @@ public final class WellOptiConfig {
 		if (hud.corner == null) hud.corner = HudCorner.TOP_LEFT;
 		if (mobs == null) mobs = new Mobs();
 		if (adaptive == null) adaptive = new Adaptive();
+		if (memory == null) memory = new Memory();
 		serverPresets = serverPresets == null ? new LinkedHashMap<>() : new LinkedHashMap<>(serverPresets);
 		// Drop entries for presets that don't exist (hand edits, or a preset removed in a future version).
 		serverPresets.values().removeIf(id -> Preset.byId(id).isEmpty());

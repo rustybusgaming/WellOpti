@@ -116,7 +116,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "显示游戏使用了多少 Java 内存。",
 	"wellopti.options.hud.showCulling": "显示剔除",
 	"wellopti.options.hud.showCulling.tooltip": "显示 WellOpti 每帧跳过绘制了多少东西。",
-	"wellopti.options.misc": "其他",
 	"wellopti.options.memoryAdvisor": "内存提示",
 	"wellopti.options.memoryAdvisor.tooltip": "当 Minecraft 分配的内存很少，或内存长时间接近占满时，显示一条简短提示。",
 	"wellopti.memory.low.title": "Minecraft 内存不足",
@@ -145,5 +144,9 @@
 	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "WellOpti 没有绘制的实体（在墙后、太远或超过农场拥挤上限）在你的画面上每秒更新 5 次而不是 20 次。一旦重新可见就会立刻追上。服务器仍然正常运行每个生物，所以农场和游戏玩法不受影响。玩家、正被乘坐的东西和附近的实体始终正常更新。",
 	"wellopti.options.perServerPresets": "按服务器记住预设",
 	"wellopti.options.perServerPresets.tooltip": "在游戏中选择预设时，WellOpti 会为该服务器（单人游戏算作一个）记住它，并在你每次进入时自动切换回来。",
-	"wellopti.preset.restored": "WellOpti：此服务器使用「%s」预设"
+	"wellopti.preset.restored": "WellOpti：此服务器使用「%s」预设",
+	"wellopti.options.memory": "内存",
+	"wellopti.options.memory.cleanOnLeave": "离开世界后释放内存",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "离开世界后，WellOpti 会丢弃自己的缓存，并请 Java 释放你刚离开的世界。这会在你停留在菜单时进行，短暂停顿不会影响游戏。可降低世界之间的内存占用，但不会提高帧率。",
+	"wellopti.benchmark.memory": "内存周转：开启 WellOpti 时 %s MB/s，垃圾回收 %s 毫秒；关闭时 %s MB/s，%s 毫秒（越低卡顿越少）"
 }

@@ -5,6 +5,7 @@ import dev.wellopti.AdaptiveDistance;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.WellOptiStats;
 import dev.wellopti.config.WellOptiConfig;
+import dev.wellopti.memory.MemoryStats;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,12 @@ public final class PerformanceHud {
 	private record Line(String text, int color) {
 	}
 
+	/** The text only changes a few times a second, so it's rebuilt at most this often instead of every frame. */
+	private static final long REBUILD_NANOS = 250_000_000L;
+
+	private final List<Line> lines = new ArrayList<>();
+	private long lastBuilt;
+
 	public void draw(HudCanvas graphics) {
 		Minecraft minecraft = Minecraft.getInstance();
 		WellOptiConfig.Hud cfg = WellOptiConfig.get().hud;
@@ -31,35 +38,10 @@ public final class PerformanceHud {
 			return;
 		}
 
-		List<Line> lines = new ArrayList<>();
-		int fps = minecraft.getFps();
-		String frameTime = fps > 0 ? String.format(" (%.1f ms)", 1000.0 / fps) : "";
-		lines.add(new Line("WellOpti" + (WellOptiClient.active ? "" : " [OFF]"), WellOptiClient.active ? TITLE : BAD));
-		lines.add(new Line(fps + " FPS" + frameTime, fps >= 60 ? GOOD : fps >= 30 ? OK : BAD));
-
-		if (cfg.showMemory) {
-			Runtime runtime = Runtime.getRuntime();
-			long used = (runtime.totalMemory() - runtime.freeMemory()) / MEGABYTE;
-			long max = runtime.maxMemory() / MEGABYTE;
-			int percent = max > 0 ? (int) (used * 100 / max) : 0;
-			lines.add(new Line(String.format("Mem %d%% %d/%d MB", percent, used, max), percent < 70 ? TEXT : percent < 90 ? OK : BAD));
-		}
-
-		if (cfg.showCulling) {
-			// Counters tick once per drawn frame, so dividing by FPS gives "skipped per frame".
-			int frames = Math.max(1, fps);
-			lines.add(new Line("Skipping per frame:", TEXT));
-			lines.add(new Line(String.format(" %d far entities", WellOptiStats.entitiesPerSecond() / frames), TEXT));
-			lines.add(new Line(String.format(" %d far block entities", WellOptiStats.blockEntitiesPerSecond() / frames), TEXT));
-			lines.add(new Line(String.format(" %d hidden behind walls", WellOptiStats.occludedPerSecond() / frames), TEXT));
-			lines.add(new Line(String.format(" %d crowded mobs", WellOptiStats.crowdedPerSecond() / frames), TEXT));
-			lines.add(new Line(String.format(" %d particles/s blocked", WellOptiStats.particlesPerSecond()), TEXT));
-			lines.add(new Line(String.format(" %d hidden entity ticks/s saved", WellOptiStats.throttledTicksPerSecond()), TEXT));
-		}
-
-		if (WellOptiConfig.get().adaptive.enabled) {
-			int percent = Math.round(AdaptiveDistance.scale() * 100);
-			lines.add(new Line("Adaptive: " + percent + "% distance", percent >= 100 ? GOOD : percent >= 75 ? OK : BAD));
+		long now = System.nanoTime();
+		if (now - lastBuilt > REBUILD_NANOS || lines.isEmpty()) {
+			lastBuilt = now;
+			rebuild(minecraft, cfg);
 		}
 
 		Font font = minecraft.font;
@@ -81,6 +63,48 @@ public final class PerformanceHud {
 		for (Line line : lines) {
 			graphics.text(font, line.text(), x + PADDING, textY, line.color());
 			textY += font.lineHeight;
+		}
+	}
+
+	private void rebuild(Minecraft minecraft, WellOptiConfig.Hud cfg) {
+		lines.clear();
+		int fps = minecraft.getFps();
+		String frameTime = fps > 0 ? String.format(" (%.1f ms)", 1000.0 / fps) : "";
+		lines.add(new Line("WellOpti" + (WellOptiClient.active ? "" : " [OFF]"), WellOptiClient.active ? TITLE : BAD));
+		lines.add(new Line(fps + " FPS" + frameTime, fps >= 60 ? GOOD : fps >= 30 ? OK : BAD));
+
+		if (cfg.showMemory) {
+			Runtime runtime = Runtime.getRuntime();
+			long used = (runtime.totalMemory() - runtime.freeMemory()) / MEGABYTE;
+			long max = runtime.maxMemory() / MEGABYTE;
+			int percent = max > 0 ? (int) (used * 100 / max) : 0;
+			lines.add(new Line(String.format("Mem %d%% %d/%d MB", percent, used, max), percent < 70 ? TEXT : percent < 90 ? OK : BAD));
+
+			long allocation = MemoryStats.allocationMegabytesPerSecond();
+			if (allocation >= 0) {
+				lines.add(new Line(String.format("Alloc %d MB/s", allocation), allocation < 200 ? TEXT : allocation < 500 ? OK : BAD));
+			}
+			long collections = MemoryStats.recentCollections();
+			long gcMillis = MemoryStats.recentCollectionMillis();
+			lines.add(new Line(String.format("GC %d in %ds (%d ms)", collections, MemoryStats.windowSeconds(), gcMillis),
+				gcMillis < 100 ? TEXT : gcMillis < 500 ? OK : BAD));
+		}
+
+		if (cfg.showCulling) {
+			// Counters tick once per drawn frame, so dividing by FPS gives "skipped per frame".
+			int frames = Math.max(1, fps);
+			lines.add(new Line("Skipping per frame:", TEXT));
+			lines.add(new Line(String.format(" %d far entities", WellOptiStats.entitiesPerSecond() / frames), TEXT));
+			lines.add(new Line(String.format(" %d far block entities", WellOptiStats.blockEntitiesPerSecond() / frames), TEXT));
+			lines.add(new Line(String.format(" %d hidden behind walls", WellOptiStats.occludedPerSecond() / frames), TEXT));
+			lines.add(new Line(String.format(" %d crowded mobs", WellOptiStats.crowdedPerSecond() / frames), TEXT));
+			lines.add(new Line(String.format(" %d particles/s blocked", WellOptiStats.particlesPerSecond()), TEXT));
+			lines.add(new Line(String.format(" %d hidden entity ticks/s saved", WellOptiStats.throttledTicksPerSecond()), TEXT));
+		}
+
+		if (WellOptiConfig.get().adaptive.enabled) {
+			int percent = Math.round(AdaptiveDistance.scale() * 100);
+			lines.add(new Line("Adaptive: " + percent + "% distance", percent >= 100 ? GOOD : percent >= 75 ? OK : BAD));
 		}
 	}
 }

@@ -12,6 +12,7 @@ import net.minecraft.client.particle.ParticleRenderType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -41,6 +42,27 @@ public abstract class ParticleEngineMixin {
 		}
 	}
 
+	/**
+	 * Live particle count, refreshed once per tick and bumped as particles are added in between. Counting by
+	 * walking every particle group on each add would create an iterator per particle spawned.
+	 */
+	@Unique
+	private int wellopti$liveCount;
+
+	@Inject(method = "tick", at = @At("TAIL"))
+	private void wellopti$recount(CallbackInfo ci) {
+		int total = this.particlesToAdd.size();
+		for (ParticleGroup<?> group : this.particles.values()) {
+			total += group.size();
+		}
+		this.wellopti$liveCount = total;
+	}
+
+	@Inject(method = "clearParticles", at = @At("TAIL"), require = 0)
+	private void wellopti$resetCount(CallbackInfo ci) {
+		this.wellopti$liveCount = 0;
+	}
+
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
 	private void wellopti$capParticles(Particle particle, CallbackInfo ci) {
 		WellOptiConfig.Particles cfg = WellOptiConfig.get().particles;
@@ -54,14 +76,11 @@ public abstract class ParticleEngineMixin {
 			return;
 		}
 
-		int total = this.particlesToAdd.size();
-		for (ParticleGroup<?> existing : this.particles.values()) {
-			total += existing.size();
-		}
-
-		if (total >= cfg.maxParticles) {
+		if (this.wellopti$liveCount >= cfg.maxParticles) {
 			WellOptiStats.droppedParticles++;
 			ci.cancel();
+			return;
 		}
+		this.wellopti$liveCount++;
 	}
 }

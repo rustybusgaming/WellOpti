@@ -1,7 +1,10 @@
 package dev.wellopti.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import dev.wellopti.compat.Mc;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.phys.Vec3;
 import dev.wellopti.Culling;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
@@ -15,7 +18,7 @@ public abstract class EntityRendererMixin {
 	 * The call lives in extractNameTags on 26.2+ and in extractRenderState on 26.1. Both are listed with full
 	 * signatures (each name has overloads); on any given version exactly one of them exists.
 	 */
-	@WrapOperation(
+	@ModifyExpressionValue(
 		method = {
 			"extractNameTags(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;FDD)V",
 			"extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V"
@@ -25,7 +28,11 @@ public abstract class EntityRendererMixin {
 			target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;shouldShowName(Lnet/minecraft/world/entity/Entity;D)Z"
 		)
 	)
-	private boolean wellopti$nameTagDistance(EntityRenderer<?, ?> renderer, Entity entity, double distanceToCameraSq, Operation<Boolean> original) {
-		return original.call(renderer, entity, distanceToCameraSq) && !Culling.isNameTagTooFar(entity, distanceToCameraSq);
+	private boolean wellopti$nameTagDistance(boolean showName, @Local(argsOnly = true) Entity entity) {
+		if (!showName) {
+			return false;
+		}
+		Vec3 cam = Mc.cameraPosition(Minecraft.getInstance());
+		return !Culling.isNameTagTooFar(entity, entity.distanceToSqr(cam));
 	}
 }

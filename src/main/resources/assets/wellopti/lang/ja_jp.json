@@ -125,7 +125,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "ゲームが使っている Java のメモリ量を表示します。",
 	"wellopti.options.hud.showCulling": "カリングを表示",
 	"wellopti.options.hud.showCulling.tooltip": "WellOpti が1フレームごとに描画を省いた数を表示します。",
-	"wellopti.options.misc": "その他",
 	"wellopti.options.memoryAdvisor": "メモリのアドバイス",
 	"wellopti.options.memoryAdvisor.tooltip": "Minecraft に割り当てられたメモリがとても少ないときや、メモリがしばらくほぼ満杯のときに短い通知を表示します。",
 	"wellopti.memory.low.title": "Minecraft のメモリが不足しています",
@@ -145,5 +144,9 @@
 	"wellopti.benchmark.noToggle": "ベンチマーク中は WellOpti を切り替えられません",
 	"wellopti.benchmark.cancelled.manual": "ベンチマークを中止しました。",
 	"wellopti.benchmark.cancelled.leftWorld": "ベンチマークを中止しました：ワールドから出ました。",
-	"wellopti.benchmark.cancelled.menu": "ベンチマークを中止しました：メニューが開いたか、ウィンドウが非アクティブになり、FPS が意図的に変わりました。ゲームを前面にしたままもう一度試してください。"
+	"wellopti.benchmark.cancelled.menu": "ベンチマークを中止しました：メニューが開いたか、ウィンドウが非アクティブになり、FPS が意図的に変わりました。ゲームを前面にしたままもう一度試してください。",
+	"wellopti.options.memory": "メモリ",
+	"wellopti.options.memory.cleanOnLeave": "ワールド退出後にメモリを解放",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "ワールドから出ると、WellOpti は自分のキャッシュを破棄し、出たワールドを解放するよう Java に頼みます。短い停止が気にならないメニュー画面にいる間に行います。ワールド間のメモリ使用量は減りますが、FPS は上がりません。",
+	"wellopti.benchmark.memory": "メモリの消費：WellOpti あり %s MB/s・GC %s ms、なし %s MB/s・GC %s ms（少ないほどカクつきが減ります）"
 }

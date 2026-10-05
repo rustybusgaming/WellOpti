@@ -125,7 +125,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "Показывает, сколько памяти Java использует игра.",
 	"wellopti.options.hud.showCulling": "Показывать отсечение",
 	"wellopti.options.hud.showCulling.tooltip": "Показывает, сколько всего WellOpti не отрисовал за кадр.",
-	"wellopti.options.misc": "Прочее",
 	"wellopti.options.memoryAdvisor": "Подсказки о памяти",
 	"wellopti.options.memoryAdvisor.tooltip": "Показывает короткое уведомление, если у Minecraft очень мало памяти или память долго почти заполнена.",
 	"wellopti.memory.low.title": "Minecraft мало памяти",
@@ -145,5 +144,9 @@
 	"wellopti.benchmark.noToggle": "Нельзя включать/выключать WellOpti во время бенчмарка",
 	"wellopti.benchmark.cancelled.manual": "Бенчмарк отменён.",
 	"wellopti.benchmark.cancelled.leftWorld": "Бенчмарк отменён: вы вышли из мира.",
-	"wellopti.benchmark.cancelled.menu": "Бенчмарк отменён: открылось меню или окно потеряло фокус, а это намеренно меняет FPS. Попробуйте снова и держите игру на переднем плане."
+	"wellopti.benchmark.cancelled.menu": "Бенчмарк отменён: открылось меню или окно потеряло фокус, а это намеренно меняет FPS. Попробуйте снова и держите игру на переднем плане.",
+	"wellopti.options.memory": "Память",
+	"wellopti.options.memory.cleanOnLeave": "Освобождать память после выхода",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "Когда вы выходите из мира, WellOpti сбрасывает свои кэши и просит Java освободить покинутый мир, пока вы в меню, где короткая пауза не мешает. Снижает расход памяти между мирами; FPS это не повышает.",
+	"wellopti.benchmark.memory": "Расход памяти: %s МБ/с и %s мс сборки мусора с WellOpti; %s МБ/с и %s мс без него (меньше — значит меньше фризов)"
 }

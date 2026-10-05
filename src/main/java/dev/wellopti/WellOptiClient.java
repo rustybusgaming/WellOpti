@@ -10,6 +10,8 @@ import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
 import dev.wellopti.gui.WellOptiConfigScreen;
 import dev.wellopti.hud.PerformanceHud;
+import dev.wellopti.memory.MemoryCleanup;
+import dev.wellopti.memory.MemoryStats;
 import dev.wellopti.occlusion.OcclusionCuller;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -55,6 +57,7 @@ public class WellOptiClient implements ClientModInitializer {
 			MemoryAdvisor.onJoin(minecraft);
 			ServerPresets.joinedServer();
 		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, minecraft) -> MemoryCleanup.leftWorld());
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));
 		LOGGER.info("WellOpti loaded. Minecraft is now running very goodly.");
 	}
@@ -67,6 +70,8 @@ public class WellOptiClient implements ClientModInitializer {
 		Benchmark.tick(minecraft);
 		ServerPresets.tick(minecraft);
 		MemoryAdvisor.tick(minecraft);
+		MemoryStats.tick();
+		MemoryCleanup.tick(minecraft);
 
 		while (hudKey.consumeClick()) {
 			toggleHud(minecraft);

@@ -1,7 +1,6 @@
 package dev.wellopti.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.wellopti.Culling;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -21,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin {
 	/** CameraRenderState moved package in 26.1, so both signatures are listed; on any given version exactly one exists. */
-	@WrapOperation(
+	@WrapWithCondition(
 		method = {
 			"submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 			"submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V"
@@ -31,20 +30,17 @@ public abstract class LivingEntityRendererMixin {
 			target = "Lnet/minecraft/client/renderer/entity/layers/RenderLayer;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/EntityRenderState;FF)V"
 		)
 	)
-	private void wellopti$skipDistantEquipment(
+	private boolean wellopti$skipDistantEquipment(
 		RenderLayer<?, ?> layer,
 		PoseStack poseStack,
 		SubmitNodeCollector submitNodeCollector,
 		int lightCoords,
 		EntityRenderState state,
 		float yRot,
-		float xRot,
-		Operation<Void> original
+		float xRot
 	) {
-		if (isEquipment(layer) && Culling.shouldSkipEquipment(state.distanceToCameraSq, state instanceof AvatarRenderState)) {
-			return;
-		}
-		original.call(layer, poseStack, submitNodeCollector, lightCoords, state, yRot, xRot);
+		// Returning false skips this one layer's draw call. No wrapper object is created per call.
+		return !(isEquipment(layer) && Culling.shouldSkipEquipment(state.distanceToCameraSq, state instanceof AvatarRenderState));
 	}
 
 	private static boolean isEquipment(RenderLayer<?, ?> layer) {
