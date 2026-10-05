@@ -92,7 +92,7 @@ public final class Benchmark {
 		}
 
 		// Menus and unfocused windows change the frame rate on purpose; numbers taken then would be meaningless.
-		if (phase != Phase.COUNTDOWN && (Mc.screen(minecraft) != null || !minecraft.getWindow().isFocused())) {
+		if (phase != Phase.COUNTDOWN && (Mc.screen(minecraft) != null || !Mc.isWindowFocused(minecraft))) {
 			stop(minecraft, Component.translatable("wellopti.benchmark.cancelled.menu"));
 			return;
 		}
@@ -199,9 +199,7 @@ public final class Benchmark {
 	}
 
 	private static void progress(Minecraft minecraft, Component text) {
-		if (minecraft.player != null) {
-			minecraft.player.sendOverlayMessage(text.copy().withStyle(ChatFormatting.GOLD));
-		}
+		Mc.actionBar(minecraft, text.copy().withStyle(ChatFormatting.GOLD));
 	}
 
 	private static void message(Minecraft minecraft, Component text) {

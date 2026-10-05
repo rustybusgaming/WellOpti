@@ -7,14 +7,11 @@ import dev.wellopti.WellOptiStats;
 import dev.wellopti.config.WellOptiConfig;
 import java.util.ArrayList;
 import java.util.List;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /** A small corner overlay: FPS, frame time, memory, and what WellOpti skipped in the last second. */
-public final class PerformanceHud implements HudElement {
+public final class PerformanceHud {
 	private static final int PADDING = 3;
 	private static final int BACKGROUND = 0x90000000;
 	private static final int TITLE = 0xFFFFAA00;
@@ -27,8 +24,7 @@ public final class PerformanceHud implements HudElement {
 	private record Line(String text, int color) {
 	}
 
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+	public void draw(HudCanvas graphics) {
 		Minecraft minecraft = Minecraft.getInstance();
 		WellOptiConfig.Hud cfg = WellOptiConfig.get().hud;
 		if (!cfg.enabled || Mc.isHudHidden(minecraft) || minecraft.getDebugOverlay().showDebugScreen()) {
@@ -76,13 +72,13 @@ public final class PerformanceHud implements HudElement {
 		int boxHeight = height + PADDING * 2 - 1;
 		boolean right = cfg.corner == WellOptiConfig.HudCorner.TOP_RIGHT || cfg.corner == WellOptiConfig.HudCorner.BOTTOM_RIGHT;
 		boolean bottom = cfg.corner == WellOptiConfig.HudCorner.BOTTOM_LEFT || cfg.corner == WellOptiConfig.HudCorner.BOTTOM_RIGHT;
-		int x = right ? graphics.guiWidth() - boxWidth - 2 : 2;
-		int y = bottom ? graphics.guiHeight() - boxHeight - 2 : 2;
+		int x = right ? graphics.width() - boxWidth - 2 : 2;
+		int y = bottom ? graphics.height() - boxHeight - 2 : 2;
 
 		graphics.fill(x, y, x + boxWidth, y + boxHeight, BACKGROUND);
 		int textY = y + PADDING;
 		for (Line line : lines) {
-			graphics.text(font, line.text(), x + PADDING, textY, line.color(), false);
+			graphics.text(font, line.text(), x + PADDING, textY, line.color());
 			textY += font.lineHeight;
 		}
 	}

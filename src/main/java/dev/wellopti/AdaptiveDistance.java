@@ -1,5 +1,6 @@
 package dev.wellopti;
 
+import dev.wellopti.compat.Mc;
 import dev.wellopti.config.WellOptiConfig;
 import net.minecraft.client.Minecraft;
 
@@ -40,7 +41,7 @@ public final class AdaptiveDistance {
 		ticks = 0;
 
 		// Dynamic FPS deliberately lowers the frame rate in these cases; don't mistake that for lag.
-		if (minecraft.level == null || minecraft.isPaused() || !minecraft.getWindow().isFocused()) {
+		if (minecraft.level == null || minecraft.isPaused() || !Mc.isWindowFocused(minecraft)) {
 			return;
 		}
 

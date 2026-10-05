@@ -2,60 +2,60 @@ package dev.wellopti.compat;
 
 import dev.wellopti.hud.HudCanvas;
 import dev.wellopti.hud.PerformanceHud;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.Font;
-import net.minecraft.resources.Identifier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-/** Minecraft 26.2+: screens, chat and toasts live on {@code Minecraft.gui}. */
+/** Minecraft 1.21.x: screens, chat and toasts live directly on {@code Minecraft}; Fabric API still uses its older names. */
 public final class Mc {
 	private Mc() {
 	}
 
 	public static @Nullable Screen screen(Minecraft minecraft) {
-		return minecraft.gui.screen();
+		return minecraft.screen;
 	}
 
 	public static void setScreen(Minecraft minecraft, @Nullable Screen screen) {
-		minecraft.gui.setScreen(screen);
+		minecraft.setScreen(screen);
 	}
 
 	public static boolean isHudHidden(Minecraft minecraft) {
-		return minecraft.gui.hud.isHidden();
+		return minecraft.options.hideGui;
 	}
 
 	public static ToastManager toasts(Minecraft minecraft) {
-		return minecraft.gui.toastManager();
+		return minecraft.getToastManager();
 	}
 
 	public static void systemMessage(Minecraft minecraft, Component message) {
-		minecraft.gui.hud.getChat().addClientSystemMessage(message);
+		minecraft.gui.getChat().addMessage(message);
 	}
 
 	public static Vec3 cameraPosition(Minecraft minecraft) {
-		return minecraft.gameRenderer.mainCamera().position();
+		return minecraft.gameRenderer.getMainCamera().position();
 	}
 
 	public static boolean isWindowFocused(Minecraft minecraft) {
-		return minecraft.getWindow().isFocused();
+		return minecraft.isWindowActive();
 	}
 
 	/** Shows a short message above the hotbar. */
 	public static void actionBar(Minecraft minecraft, Component message) {
 		if (minecraft.player != null) {
-			minecraft.player.sendOverlayMessage(message);
+			minecraft.player.displayClientMessage(message, true);
 		}
 	}
 
 	public static KeyMapping registerKey(KeyMapping key) {
-		return KeyMappingHelper.registerKeyMapping(key);
+		return KeyBindingHelper.registerKeyBinding(key);
 	}
 
 	public static void registerHud(Identifier id, PerformanceHud hud) {
@@ -77,7 +77,7 @@ public final class Mc {
 
 			@Override
 			public void text(Font font, String text, int x, int y, int color) {
-				graphics.text(font, text, x, y, color, false);
+				graphics.drawString(font, text, x, y, color, false);
 			}
 		}));
 	}

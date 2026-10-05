@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         # Keep in step with supported_versions in gradle.properties.
-        mc: ["26.3", "26.2", "26.1.2"]
+        mc: ["26.3", "26.2", "26.1.2", "1.21.11"]
     steps:
       - uses: actions/checkout@v4
 

@@ -1,5 +1,6 @@
 package dev.wellopti.audio;
 
+import dev.wellopti.compat.Mc;
 import com.mojang.blaze3d.platform.Window;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.config.WellOptiConfig;
@@ -26,7 +27,7 @@ public final class BackgroundAudio {
 			Window window = minecraft.getWindow();
 			if (window.isIconified()) {
 				target = cfg.minimizedVolume / 100.0F;
-			} else if (!window.isFocused()) {
+			} else if (!Mc.isWindowFocused(minecraft)) {
 				target = cfg.unfocusedVolume / 100.0F;
 			}
 		}

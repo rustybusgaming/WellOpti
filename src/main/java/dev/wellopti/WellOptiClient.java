@@ -1,10 +1,9 @@
 package dev.wellopti;
 
 import dev.wellopti.compat.Mc;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
-
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.wellopti.audio.BackgroundAudio;
 import dev.wellopti.bench.Benchmark;
 import dev.wellopti.config.Preset;
@@ -16,9 +15,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -49,11 +46,11 @@ public class WellOptiClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		WellOptiConfig.load();
 
-		toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.toggle", InputConstants.KEY_F7, KEY_CATEGORY));
-		configKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.config", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
-		hudKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.hud", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
+		toggleKey = Mc.registerKey(new KeyMapping("key.wellopti.toggle", InputConstants.KEY_F7, KEY_CATEGORY));
+		configKey = Mc.registerKey(new KeyMapping("key.wellopti.config", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
+		hudKey = Mc.registerKey(new KeyMapping("key.wellopti.hud", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
 
-		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "performance_hud"), new PerformanceHud());
+		Mc.registerHud(Identifier.fromNamespaceAndPath(MOD_ID, "performance_hud"), new PerformanceHud());
 		ClientTickEvents.END_CLIENT_TICK.register(WellOptiClient::onEndTick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> MemoryAdvisor.onJoin(minecraft));
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));
@@ -88,16 +85,12 @@ public class WellOptiClient implements ClientModInitializer {
 
 	private static void toggle(Minecraft minecraft) {
 		if (Benchmark.isRunning()) {
-			if (minecraft.player != null) {
-				minecraft.player.sendOverlayMessage(Component.translatable("wellopti.benchmark.noToggle").withStyle(ChatFormatting.RED));
-			}
+			Mc.actionBar(minecraft, Component.translatable("wellopti.benchmark.noToggle").withStyle(ChatFormatting.RED));
 			return;
 		}
 		active = !active;
-		if (minecraft.player != null) {
-			minecraft.player.sendOverlayMessage(Component.translatable(active ? "wellopti.toggle.on" : "wellopti.toggle.off")
-				.withStyle(active ? ChatFormatting.GREEN : ChatFormatting.RED));
-		}
+		Mc.actionBar(minecraft, Component.translatable(active ? "wellopti.toggle.on" : "wellopti.toggle.off")
+			.withStyle(active ? ChatFormatting.GREEN : ChatFormatting.RED));
 	}
 
 	private static void toggleHud(Minecraft minecraft) {
@@ -182,6 +175,11 @@ public class WellOptiClient implements ClientModInitializer {
 		WellOptiConfig cfg = WellOptiConfig.get();
 		preset.applyTo(cfg);
 		cfg.save();
+	}
+
+	/** Brigadier's own builder, which is the same on every Minecraft version (Fabric's helper was renamed in 26.1). */
+	private static LiteralArgumentBuilder<FabricClientCommandSource> literal(String name) {
+		return LiteralArgumentBuilder.literal(name);
 	}
 
 	private static String offIfZero(int value) {
