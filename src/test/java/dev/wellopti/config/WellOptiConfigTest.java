@@ -1,0 +1,102 @@
+package dev.wellopti.config;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import com.google.gson.Gson;
+import org.junit.jupiter.api.Test;
+
+class WellOptiConfigTest {
+	private static final Gson GSON = new Gson();
+
+	@Test
+	void balancedPresetMatchesDefaults() {
+		WellOptiConfig preset = new WellOptiConfig();
+		Preset.BALANCED.applyTo(preset);
+		assertEquals(GSON.toJson(new WellOptiConfig()), GSON.toJson(preset), "the Balanced preset should be exactly the defaults");
+	}
+
+	@Test
+	void presetsGetMoreAggressiveInOrder() {
+		Preset[] presets = Preset.values();
+		for (int i = 1; i < presets.length; i++) {
+			WellOptiConfig lighter = new WellOptiConfig();
+			WellOptiConfig heavier = new WellOptiConfig();
+			presets[i - 1].applyTo(lighter);
+			presets[i].applyTo(heavier);
+			String pair = presets[i - 1] + " -> " + presets[i];
+			assertLessOrEqual(heavier.entityCulling.droppedItems, lighter.entityCulling.droppedItems, pair);
+			assertLessOrEqual(heavier.blockEntityCulling.storage, lighter.blockEntityCulling.storage, pair);
+			assertLessOrEqual(heavier.particles.maxParticles, lighter.particles.maxParticles, pair);
+			assertLessOrEqual(heavier.dynamicFps.unfocusedFps, lighter.dynamicFps.unfocusedFps, pair);
+			assertLessOrEqual(heavier.entityCulling.passiveMobs, lighter.entityCulling.passiveMobs, pair);
+			assertLessOrEqual(heavier.entityCulling.hostileMobs, lighter.entityCulling.hostileMobs, pair);
+			assertLessOrEqual(heavier.mobs.crowdLimit, lighter.mobs.crowdLimit, pair);
+			assertLessOrEqual(heavier.mobs.equipmentDistance, lighter.mobs.equipmentDistance, pair);
+		}
+	}
+
+	@Test
+	void missingSectionsAreFilledIn() {
+		WellOptiConfig cfg = GSON.fromJson("{\"particles\": {\"enabled\": false, \"maxParticles\": 123}}", WellOptiConfig.class);
+		cfg.sanitize();
+		assertNotNull(cfg.dynamicFps);
+		assertNotNull(cfg.occlusionCulling);
+		assertNotNull(cfg.hud.corner);
+		assertNotNull(cfg.mobs);
+		assertNotNull(cfg.adaptive);
+		assertEquals(123, cfg.particles.maxParticles);
+		assertEquals(false, cfg.particles.enabled);
+		assertEquals(new WellOptiConfig().entityCulling.droppedItems, cfg.entityCulling.droppedItems);
+	}
+
+	@Test
+	void sillyValuesAreClamped() {
+		WellOptiConfig cfg = GSON.fromJson(
+			"{\"dynamicFps\": {\"unfocusedFps\": -5, \"minimizedFps\": 9999},"
+				+ " \"entityCulling\": {\"droppedItems\": -1},"
+				+ " \"backgroundAudio\": {\"unfocusedVolume\": 250},"
+				+ " \"mobs\": {\"nameTagDistance\": 500},"
+				+ " \"adaptive\": {\"minScale\": 0}}",
+			WellOptiConfig.class);
+		cfg.sanitize();
+		assertEquals(1, cfg.dynamicFps.unfocusedFps);
+		assertEquals(260, cfg.dynamicFps.minimizedFps);
+		assertEquals(0, cfg.entityCulling.droppedItems);
+		assertEquals(100, cfg.backgroundAudio.unfocusedVolume);
+		assertEquals(64, cfg.mobs.nameTagDistance, "can't exceed vanilla's own name tag range");
+		assertEquals(10, cfg.adaptive.minScale);
+	}
+
+	@Test
+	void unknownHudCornerFallsBackToDefault() {
+		WellOptiConfig cfg = GSON.fromJson("{\"hud\": {\"corner\": \"MIDDLE_OF_NOWHERE\"}}", WellOptiConfig.class);
+		cfg.sanitize();
+		assertEquals(WellOptiConfig.HudCorner.TOP_LEFT, cfg.hud.corner);
+	}
+
+	@Test
+	void serverPresetsSurviveRoundTripAndDropUnknownIds() {
+		WellOptiConfig cfg = GSON.fromJson(
+			"{\"serverPresets\": {\"singleplayer\": \"quality\", \"server:mc.example.net\": \"potato\", \"server:old\": \"turbo\"}}",
+			WellOptiConfig.class);
+		cfg.sanitize();
+		assertEquals("quality", cfg.serverPresets.get("singleplayer"));
+		assertEquals("potato", cfg.serverPresets.get("server:mc.example.net"));
+		assertEquals(false, cfg.serverPresets.containsKey("server:old"), "an unknown preset id is dropped");
+		assertEquals(Preset.POTATO, Preset.byId("potato").orElseThrow());
+	}
+
+	@Test
+	void missingServerPresetsMapIsCreated() {
+		WellOptiConfig cfg = GSON.fromJson("{\"serverPresets\": null}", WellOptiConfig.class);
+		cfg.sanitize();
+		assertNotNull(cfg.serverPresets);
+	}
+
+	private static void assertLessOrEqual(int actual, int limit, String message) {
+		if (actual > limit) {
+			throw new AssertionError(message + ": expected " + actual + " <= " + limit);
+		}
+	}
+}

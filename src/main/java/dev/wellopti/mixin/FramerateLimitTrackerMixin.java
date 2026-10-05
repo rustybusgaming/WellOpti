@@ -1,5 +1,6 @@
 package dev.wellopti.mixin;
 
+import dev.wellopti.compat.Mc;
 import com.mojang.blaze3d.platform.FramerateLimitTracker;
 import com.mojang.blaze3d.platform.Window;
 import dev.wellopti.WellOptiClient;
@@ -30,7 +31,7 @@ public abstract class FramerateLimitTrackerMixin {
 		int limit = cir.getReturnValueI();
 		if (window.isIconified()) {
 			cir.setReturnValue(Math.min(limit, cfg.minimizedFps));
-		} else if (!window.isFocused()) {
+		} else if (!Mc.isWindowFocused(this.minecraft)) {
 			cir.setReturnValue(Math.min(limit, cfg.unfocusedFps));
 		} else if (cfg.pausedFps > 0 && this.minecraft.isPaused()) {
 			cir.setReturnValue(Math.min(limit, cfg.pausedFps));
