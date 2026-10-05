@@ -1,11 +1,19 @@
 package dev.wellopti.gui;
 
+import com.mojang.serialization.Codec;
+import dev.wellopti.WellOptiClient;
+import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.function.IntUnaryOperator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.CommonComponents;
@@ -25,6 +33,25 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		WellOptiConfig.EntityCulling entities = cfg.entityCulling;
 		WellOptiConfig.BlockEntityCulling blockEntities = cfg.blockEntityCulling;
 		WellOptiConfig.Particles particles = cfg.particles;
+		WellOptiConfig.OcclusionCulling occlusion = cfg.occlusionCulling;
+		WellOptiConfig.BackgroundAudio audio = cfg.backgroundAudio;
+		WellOptiConfig.Hud hud = cfg.hud;
+
+		this.list.addHeader(Component.translatable("wellopti.options.presets"));
+		List<AbstractWidget> presetButtons = new ArrayList<>();
+		for (Preset preset : Preset.values()) {
+			presetButtons.add(Button.builder(Component.translatable(preset.translationKey()), button -> this.applyPreset(preset))
+				.tooltip(Tooltip.create(Component.translatable(preset.translationKey() + ".tooltip")))
+				.build());
+		}
+		this.list.addSmall(presetButtons);
+
+		this.list.addHeader(Component.translatable("wellopti.options.occlusionCulling"));
+		this.list.addBig(toggle("wellopti.options.occlusionCulling.enabled", occlusion.enabled, v -> occlusion.enabled = v));
+		this.list.addSmall(
+			toggle("wellopti.options.occlusionCulling.entities", occlusion.entities, v -> occlusion.entities = v),
+			toggle("wellopti.options.occlusionCulling.blockEntities", occlusion.blockEntities, v -> occlusion.blockEntities = v)
+		);
 
 		this.list.addHeader(Component.translatable("wellopti.options.dynamicFps"));
 		this.list.addBig(toggle("wellopti.options.dynamicFps.enabled", fps.enabled, v -> fps.enabled = v));
@@ -67,6 +94,33 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			slider("wellopti.options.particles.max", 0, 40, 500, particles.maxParticles, v -> particles.maxParticles = v,
 				(caption, v) -> v == 0 ? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF) : Options.genericValueLabel(caption, v))
 		);
+
+		this.list.addHeader(Component.translatable("wellopti.options.backgroundAudio"));
+		this.list.addSmall(
+			volume("wellopti.options.backgroundAudio.unfocused", audio.unfocusedVolume, v -> audio.unfocusedVolume = v),
+			volume("wellopti.options.backgroundAudio.minimized", audio.minimizedVolume, v -> audio.minimizedVolume = v)
+		);
+
+		this.list.addHeader(Component.translatable("wellopti.options.hud"));
+		this.list.addSmall(
+			toggle("wellopti.options.hud.enabled", hud.enabled, v -> hud.enabled = v),
+			new OptionInstance<>(
+				"wellopti.options.hud.corner",
+				tooltip("wellopti.options.hud.corner"),
+				(caption, corner) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.hud.corner." + corner.name().toLowerCase(java.util.Locale.ROOT))),
+				new OptionInstance.Enum<>(List.of(WellOptiConfig.HudCorner.values()), Codec.INT.xmap(i -> WellOptiConfig.HudCorner.values()[i], Enum::ordinal)),
+				hud.corner,
+				v -> hud.corner = v
+			),
+			toggle("wellopti.options.hud.showMemory", hud.showMemory, v -> hud.showMemory = v),
+			toggle("wellopti.options.hud.showCulling", hud.showCulling, v -> hud.showCulling = v)
+		);
+	}
+
+	/** Applies a preset, then rebuilds the screen so every slider shows its new value. */
+	private void applyPreset(Preset preset) {
+		WellOptiClient.applyPreset(preset);
+		this.minecraft.gui.setScreen(new WellOptiConfigScreen(this.lastScreen));
 	}
 
 	@Override
@@ -84,6 +138,10 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		return slider(key, 0, 32, 4, initial, setter, (caption, v) -> v == 0
 			? Options.genericValueLabel(caption, CommonComponents.OPTION_OFF)
 			: Options.genericValueLabel(caption, Component.translatable("wellopti.options.blocks", v)));
+	}
+
+	private static OptionInstance<Integer> volume(String key, int initial, IntConsumer setter) {
+		return slider(key, 0, 20, 5, initial, setter, (caption, v) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.percent", v)));
 	}
 
 	private static OptionInstance<Integer> fpsSlider(String key, int min, int max, int initial, IntConsumer setter) {

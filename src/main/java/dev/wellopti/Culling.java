@@ -2,8 +2,12 @@ package dev.wellopti;
 
 import dev.wellopti.config.WellOptiConfig;
 import dev.wellopti.mixin.AbstractArrowAccessor;
+import dev.wellopti.occlusion.OcclusionCuller;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.ambient.AmbientCreature;
@@ -68,6 +72,45 @@ public final class Culling {
 
 		WellOptiStats.culledBlockEntities++;
 		return true;
+	}
+
+	/**
+	 * Called after vanilla has decided an entity is on screen: hides it anyway if it's entirely behind solid blocks.
+	 * Players are never hidden this way, because vanilla shows their name tags through walls.
+	 */
+	public static boolean isEntityOccluded(Entity entity, double camX, double camY, double camZ) {
+		WellOptiConfig.OcclusionCulling cfg = WellOptiConfig.get().occlusionCulling;
+		if (!cfg.enabled || !cfg.entities || !WellOptiClient.active) {
+			return false;
+		}
+
+		Minecraft minecraft = Minecraft.getInstance();
+		ClientLevel level = minecraft.level;
+		Entity camera = minecraft.getCameraEntity();
+		if (level == null || entity instanceof Player || entity.isCurrentlyGlowing() || entity == camera) {
+			return false;
+		}
+
+		// Leads are drawn from the leashed mob to its holder and can be visible when either end is hidden.
+		if (entity instanceof Leashable leashable && leashable.isLeashed()) {
+			return false;
+		}
+
+		if (camera != null && (entity.hasPassenger(camera) || camera.hasPassenger(entity))) {
+			return false;
+		}
+
+		return OcclusionCuller.isEntityHidden(entity, level, new Vec3(camX, camY, camZ));
+	}
+
+	public static boolean isBlockEntityOccluded(BlockEntity blockEntity, Vec3 cameraPos) {
+		WellOptiConfig.OcclusionCulling cfg = WellOptiConfig.get().occlusionCulling;
+		if (!cfg.enabled || !cfg.blockEntities || !WellOptiClient.active || cameraPos == null) {
+			return false;
+		}
+
+		ClientLevel level = Minecraft.getInstance().level;
+		return level != null && OcclusionCuller.isBlockEntityHidden(blockEntity.getBlockPos(), level, cameraPos);
 	}
 
 	private static int entityLimit(Entity entity, WellOptiConfig.EntityCulling cfg) {

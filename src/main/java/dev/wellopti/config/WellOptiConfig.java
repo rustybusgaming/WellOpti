@@ -17,7 +17,6 @@ import net.fabricmc.loader.api.FabricLoader;
  */
 public final class WellOptiConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("wellopti.json");
 
 	private static WellOptiConfig instance = new WellOptiConfig();
 
@@ -25,6 +24,9 @@ public final class WellOptiConfig {
 	public EntityCulling entityCulling = new EntityCulling();
 	public BlockEntityCulling blockEntityCulling = new BlockEntityCulling();
 	public Particles particles = new Particles();
+	public OcclusionCulling occlusionCulling = new OcclusionCulling();
+	public BackgroundAudio backgroundAudio = new BackgroundAudio();
+	public Hud hud = new Hud();
 
 	public static final class DynamicFps {
 		/** Lower the frame rate when the game window isn't focused or is minimised. */
@@ -70,17 +72,47 @@ public final class WellOptiConfig {
 		public int maxParticles = 4000;
 	}
 
+	public static final class OcclusionCulling {
+		/** Skip drawing things that are completely hidden behind solid blocks. */
+		public boolean enabled = true;
+		public boolean entities = true;
+		public boolean blockEntities = true;
+	}
+
+	public static final class BackgroundAudio {
+		/** Game volume, in percent, while another window has focus. 100 leaves it alone. */
+		public int unfocusedVolume = 100;
+		/** Game volume, in percent, while the window is minimised. 100 leaves it alone. */
+		public int minimizedVolume = 100;
+	}
+
+	public static final class Hud {
+		/** Small overlay with FPS, memory and how much WellOpti is skipping. */
+		public boolean enabled = false;
+		public HudCorner corner = HudCorner.TOP_LEFT;
+		public boolean showMemory = true;
+		public boolean showCulling = true;
+	}
+
+	public enum HudCorner {
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
+	}
+
 	public static WellOptiConfig get() {
 		return instance;
 	}
 
 	public static void load() {
 		WellOptiConfig loaded = null;
-		if (Files.exists(PATH)) {
-			try (Reader reader = Files.newBufferedReader(PATH)) {
+		Path path = path();
+		if (Files.exists(path)) {
+			try (Reader reader = Files.newBufferedReader(path)) {
 				loaded = GSON.fromJson(reader, WellOptiConfig.class);
 			} catch (IOException | JsonParseException e) {
-				WellOptiClient.LOGGER.error("Could not read {}, using defaults", PATH, e);
+				WellOptiClient.LOGGER.error("Could not read {}, using defaults", path, e);
 			}
 		}
 
@@ -90,22 +122,31 @@ public final class WellOptiConfig {
 	}
 
 	public void save() {
+		Path path = path();
 		try {
-			Files.createDirectories(PATH.getParent());
-			try (Writer writer = Files.newBufferedWriter(PATH)) {
+			Files.createDirectories(path.getParent());
+			try (Writer writer = Files.newBufferedWriter(path)) {
 				GSON.toJson(this, writer);
 			}
 		} catch (IOException e) {
-			WellOptiClient.LOGGER.error("Could not write {}", PATH, e);
+			WellOptiClient.LOGGER.error("Could not write {}", path, e);
 		}
 	}
 
+	private static Path path() {
+		return FabricLoader.getInstance().getConfigDir().resolve("wellopti.json");
+	}
+
 	/** Fills in sections missing from older or hand-edited files and clamps silly values. */
-	private void sanitize() {
+	void sanitize() {
 		if (dynamicFps == null) dynamicFps = new DynamicFps();
 		if (entityCulling == null) entityCulling = new EntityCulling();
 		if (blockEntityCulling == null) blockEntityCulling = new BlockEntityCulling();
 		if (particles == null) particles = new Particles();
+		if (occlusionCulling == null) occlusionCulling = new OcclusionCulling();
+		if (backgroundAudio == null) backgroundAudio = new BackgroundAudio();
+		if (hud == null) hud = new Hud();
+		if (hud.corner == null) hud.corner = HudCorner.TOP_LEFT;
 
 		dynamicFps.unfocusedFps = clamp(dynamicFps.unfocusedFps, 1, 260);
 		dynamicFps.minimizedFps = clamp(dynamicFps.minimizedFps, 1, 260);
@@ -125,6 +166,9 @@ public final class WellOptiConfig {
 		blockEntityCulling.itemDisplays = clamp(blockEntityCulling.itemDisplays, 0, 1024);
 
 		particles.maxParticles = clamp(particles.maxParticles, 0, 65536);
+
+		backgroundAudio.unfocusedVolume = clamp(backgroundAudio.unfocusedVolume, 0, 100);
+		backgroundAudio.minimizedVolume = clamp(backgroundAudio.minimizedVolume, 0, 100);
 	}
 
 	private static int clamp(int value, int min, int max) {

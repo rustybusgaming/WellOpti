@@ -4,13 +4,19 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import dev.wellopti.audio.BackgroundAudio;
+import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
 import dev.wellopti.gui.WellOptiConfigScreen;
+import dev.wellopti.hud.PerformanceHud;
+import dev.wellopti.occlusion.OcclusionCuller;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -32,6 +38,7 @@ public class WellOptiClient implements ClientModInitializer {
 	private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, MOD_ID));
 	private static KeyMapping toggleKey;
 	private static KeyMapping configKey;
+	private static KeyMapping hudKey;
 
 	/** Commands run while the chat screen is open, which closes right after; open our screen a tick later instead. */
 	private static boolean openConfigNextTick;
@@ -42,13 +49,23 @@ public class WellOptiClient implements ClientModInitializer {
 
 		toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.toggle", InputConstants.KEY_F7, KEY_CATEGORY));
 		configKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.config", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
+		hudKey = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.wellopti.hud", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
 
+		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "performance_hud"), new PerformanceHud());
 		ClientTickEvents.END_CLIENT_TICK.register(WellOptiClient::onEndTick);
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));
 		LOGGER.info("WellOpti loaded. Minecraft is now running very goodly.");
 	}
 
 	private static void onEndTick(Minecraft minecraft) {
+		OcclusionCuller.tick(minecraft.level);
+		WellOptiStats.tick();
+		BackgroundAudio.tick(minecraft);
+
+		while (hudKey.consumeClick()) {
+			toggleHud(minecraft);
+		}
+
 		while (toggleKey.consumeClick()) {
 			toggle(minecraft);
 		}
@@ -71,6 +88,12 @@ public class WellOptiClient implements ClientModInitializer {
 		}
 	}
 
+	private static void toggleHud(Minecraft minecraft) {
+		WellOptiConfig cfg = WellOptiConfig.get();
+		cfg.hud.enabled = !cfg.hud.enabled;
+		cfg.save();
+	}
+
 	private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
 		dispatcher.register(literal(MOD_ID)
 			.executes(ctx -> {
@@ -90,11 +113,22 @@ public class WellOptiClient implements ClientModInitializer {
 						+ ", skulls " + cfg.blockEntityCulling.skulls + ", storage " + cfg.blockEntityCulling.storage
 						+ ", displays " + cfg.blockEntityCulling.itemDisplays));
 				source.sendFeedback(line("Particle cap", cfg.particles.enabled, offIfZero(cfg.particles.maxParticles) + " max"));
+				source.sendFeedback(line("Occlusion culling", cfg.occlusionCulling.enabled,
+					(cfg.occlusionCulling.entities ? "entities" : "") + (cfg.occlusionCulling.entities && cfg.occlusionCulling.blockEntities ? " + " : "")
+						+ (cfg.occlusionCulling.blockEntities ? "block entities" : "")));
+				source.sendFeedback(Component.literal("Background volume: unfocused " + cfg.backgroundAudio.unfocusedVolume
+					+ "%, minimised " + cfg.backgroundAudio.minimizedVolume + "%").withStyle(ChatFormatting.GRAY));
 				source.sendFeedback(Component.literal("/wellopti config to change settings").withStyle(ChatFormatting.GRAY));
 				return 1;
 			})
 			.then(literal("config").executes(ctx -> {
 				openConfigNextTick = true;
+				return 1;
+			}))
+			.then(presetCommand())
+			.then(literal("hud").executes(ctx -> {
+				toggleHud(ctx.getSource().getClient());
+				ctx.getSource().sendFeedback(Component.literal("Performance HUD " + (WellOptiConfig.get().hud.enabled ? "shown." : "hidden.")));
 				return 1;
 			}))
 			.then(literal("toggle").executes(ctx -> {
@@ -107,14 +141,32 @@ public class WellOptiClient implements ClientModInitializer {
 				return 1;
 			}))
 			.then(literal("stats").executes(ctx -> {
-				double seconds = WellOptiStats.secondsSinceReset();
+				double[] s = WellOptiStats.sinceLastCommand();
 				ctx.getSource().sendFeedback(Component.literal(String.format(
-					"Over the last %.0fs WellOpti skipped %,d entity draws, %,d block entity draws and %,d particles (%.0f draws/s).",
-					seconds, WellOptiStats.culledEntities, WellOptiStats.culledBlockEntities, WellOptiStats.droppedParticles,
-					(WellOptiStats.culledEntities + WellOptiStats.culledBlockEntities) / seconds)));
-				WellOptiStats.reset();
+					"Over the last %.0fs WellOpti skipped %,.0f far entity draws, %,.0f far block entity draws, "
+						+ "%,.0f draws of things hidden behind walls, and %,.0f particles.",
+					s[4], s[0], s[1], s[2], s[3])));
 				return 1;
 			})));
+	}
+
+	private static LiteralArgumentBuilder<FabricClientCommandSource> presetCommand() {
+		LiteralArgumentBuilder<FabricClientCommandSource> command = literal("preset");
+		for (Preset preset : Preset.values()) {
+			command.then(literal(preset.id()).executes(ctx -> {
+				applyPreset(preset);
+				ctx.getSource().sendFeedback(Component.translatable("wellopti.preset.applied", Component.translatable(preset.translationKey()))
+					.withStyle(ChatFormatting.GREEN));
+				return 1;
+			}));
+		}
+		return command;
+	}
+
+	public static void applyPreset(Preset preset) {
+		WellOptiConfig cfg = WellOptiConfig.get();
+		preset.applyTo(cfg);
+		cfg.save();
 	}
 
 	private static String offIfZero(int value) {

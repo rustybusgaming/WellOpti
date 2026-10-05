@@ -19,4 +19,14 @@ public abstract class EntityRenderDispatcherMixin {
 			cir.setReturnValue(false);
 		}
 	}
+
+	/** Runs after vanilla's view-cone check, so we only raycast for entities that would otherwise be drawn. */
+	@Inject(method = "shouldRender", at = @At("RETURN"), cancellable = true)
+	private void wellopti$cullOccludedEntities(
+		Entity entity, Frustum culler, double camX, double camY, double camZ, float partialTicks, CallbackInfoReturnable<Boolean> cir
+	) {
+		if (cir.getReturnValueZ() && Culling.isEntityOccluded(entity, camX, camY, camZ)) {
+			cir.setReturnValue(false);
+		}
+	}
 }
