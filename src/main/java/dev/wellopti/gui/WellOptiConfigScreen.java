@@ -9,7 +9,6 @@ import dev.wellopti.config.WellOptiConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntConsumer;
-import java.util.function.IntUnaryOperator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
@@ -20,11 +19,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.Nullable;
 
 /** In-game settings, built from vanilla option widgets so it looks and behaves like the video settings screen. */
 public class WellOptiConfigScreen extends OptionsSubScreen {
-	public WellOptiConfigScreen(@Nullable Screen lastScreen) {
+	public WellOptiConfigScreen(Screen lastScreen) {
 		super(lastScreen, Minecraft.getInstance().options, Component.translatable("wellopti.options.title"));
 	}
 
@@ -41,7 +39,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		WellOptiConfig.Mobs mobs = cfg.mobs;
 		WellOptiConfig.Adaptive adaptive = cfg.adaptive;
 
-		this.list.addHeader(Component.translatable("wellopti.options.presets"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.presets"), this.font);
 		List<AbstractWidget> presetButtons = new ArrayList<>();
 		for (Preset preset : Preset.values()) {
 			presetButtons.add(Button.builder(Component.translatable(preset.translationKey()), button -> this.applyPreset(preset))
@@ -60,14 +58,14 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		benchmark.active = this.minecraft.level != null && !Benchmark.isRunning();
 		this.list.addSmall(benchmark, null);
 
-		this.list.addHeader(Component.translatable("wellopti.options.occlusionCulling"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.occlusionCulling"), this.font);
 		this.list.addBig(toggle("wellopti.options.occlusionCulling.enabled", occlusion.enabled, v -> occlusion.enabled = v));
 		this.list.addSmall(
 			toggle("wellopti.options.occlusionCulling.entities", occlusion.entities, v -> occlusion.entities = v),
 			toggle("wellopti.options.occlusionCulling.blockEntities", occlusion.blockEntities, v -> occlusion.blockEntities = v)
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.dynamicFps"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.dynamicFps"), this.font);
 		this.list.addBig(toggle("wellopti.options.dynamicFps.enabled", fps.enabled, v -> fps.enabled = v));
 		this.list.addSmall(
 			fpsSlider("wellopti.options.dynamicFps.unfocused", 1, 60, fps.unfocusedFps, v -> fps.unfocusedFps = v),
@@ -75,7 +73,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 		);
 		this.list.addSmall(slider("wellopti.options.dynamicFps.paused", 0, 26, 10, fps.pausedFps, v -> fps.pausedFps = v, WellOptiConfigScreen::fpsLabel));
 
-		this.list.addHeader(Component.translatable("wellopti.options.entityCulling"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.entityCulling"), this.font);
 		this.list.addSmall(
 			toggle("wellopti.options.entityCulling.enabled", entities.enabled, v -> entities.enabled = v),
 			toggle("wellopti.options.disableWhileScoping", entities.disableWhileScoping, v -> entities.disableWhileScoping = v)
@@ -89,10 +87,12 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			distance("wellopti.options.entityCulling.ambientMobs", entities.ambientMobs, v -> entities.ambientMobs = v),
 			distance("wellopti.options.entityCulling.passiveMobs", entities.passiveMobs, v -> entities.passiveMobs = v),
 			distance("wellopti.options.entityCulling.villagers", entities.villagers, v -> entities.villagers = v),
-			distance("wellopti.options.entityCulling.hostileMobs", entities.hostileMobs, v -> entities.hostileMobs = v)
+			distance("wellopti.options.entityCulling.hostileMobs", entities.hostileMobs, v -> entities.hostileMobs = v),
+			distance("wellopti.options.entityCulling.paintings", entities.paintings, v -> entities.paintings = v),
+			distance("wellopti.options.entityCulling.vehicles", entities.vehicles, v -> entities.vehicles = v)
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.mobs"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.mobs"), this.font);
 		this.list.addSmall(
 			distance("wellopti.options.mobs.equipmentDistance", mobs.equipmentDistance, v -> mobs.equipmentDistance = v),
 			slider("wellopti.options.mobs.nameTagDistance", 0, 16, 4, mobs.nameTagDistance, v -> mobs.nameTagDistance = v, WellOptiConfigScreen::blocksLabel),
@@ -101,7 +101,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 				: Options.genericValueLabel(caption, Component.translatable("wellopti.options.perBlock", v)))
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.blockEntityCulling"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.blockEntityCulling"), this.font);
 		this.list.addSmall(
 			toggle("wellopti.options.blockEntityCulling.enabled", blockEntities.enabled, v -> blockEntities.enabled = v),
 			toggle("wellopti.options.disableWhileScoping", blockEntities.disableWhileScoping, v -> blockEntities.disableWhileScoping = v)
@@ -115,7 +115,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			distance("wellopti.options.blockEntityCulling.spawners", blockEntities.spawners, v -> blockEntities.spawners = v)
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.particles"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.particles"), this.font);
 		this.list.addSmall(
 			toggle("wellopti.options.particles.enabled", particles.enabled, v -> particles.enabled = v),
 			slider("wellopti.options.particles.max", 0, 40, 500, particles.maxParticles, v -> particles.maxParticles = v,
@@ -125,7 +125,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 				(caption, v) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.percent", v)))
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.adaptive"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.adaptive"), this.font);
 		this.list.addBig(toggle("wellopti.options.adaptive.enabled", adaptive.enabled, v -> adaptive.enabled = v));
 		this.list.addSmall(
 			slider("wellopti.options.adaptive.targetFps", 1, 26, 10, adaptive.targetFps, v -> adaptive.targetFps = v, WellOptiConfigScreen::fpsLabel),
@@ -133,13 +133,13 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 				(caption, v) -> Options.genericValueLabel(caption, Component.translatable("wellopti.options.percent", v)))
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.backgroundAudio"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.backgroundAudio"), this.font);
 		this.list.addSmall(
 			volume("wellopti.options.backgroundAudio.unfocused", audio.unfocusedVolume, v -> audio.unfocusedVolume = v),
 			volume("wellopti.options.backgroundAudio.minimized", audio.minimizedVolume, v -> audio.minimizedVolume = v)
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.hud"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.hud"), this.font);
 		this.list.addSmall(
 			toggle("wellopti.options.hud.enabled", hud.enabled, v -> hud.enabled = v),
 			new OptionInstance<>(
@@ -154,7 +154,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			toggle("wellopti.options.hud.showCulling", hud.showCulling, v -> hud.showCulling = v)
 		);
 
-		this.list.addHeader(Component.translatable("wellopti.options.misc"));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.misc"), this.font);
 		this.list.addSmall(toggle("wellopti.options.memoryAdvisor", cfg.memoryAdvisor, v -> cfg.memoryAdvisor = v));
 	}
 
@@ -202,16 +202,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 	private static OptionInstance<Integer> slider(
 		String key, int minStep, int maxStep, int stepSize, int initial, IntConsumer setter, OptionInstance.CaptionBasedToString<Integer> label
 	) {
-		IntUnaryOperator toValue = step -> step * stepSize;
-		IntUnaryOperator toStep = value -> Math.round((float) value / stepSize);
-		return new OptionInstance<>(
-			key,
-			tooltip(key),
-			label,
-			new OptionInstance.IntRange(minStep, maxStep).xmap(toValue::applyAsInt, toStep::applyAsInt, true),
-			initial,
-			setter::accept
-		);
+		return Mc.steppedSlider(key, tooltip(key), label, minStep, maxStep, stepSize, initial, setter);
 	}
 
 	private static <T> OptionInstance.TooltipSupplier<T> tooltip(String key) {

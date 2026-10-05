@@ -9,8 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -65,7 +63,7 @@ public final class AmbientParticles {
 		if (ambient == null) {
 			Set<ParticleType<?>> types = new ReferenceOpenHashSet<>();
 			for (String id : AMBIENT_IDS) {
-				BuiltInRegistries.PARTICLE_TYPE.getOptional(Identifier.withDefaultNamespace(id)).ifPresent(types::add);
+				Mc.particleType(id).ifPresent(types::add);
 			}
 			ambient = types;
 		}

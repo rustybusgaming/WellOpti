@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.Window;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.config.WellOptiConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.sounds.SoundSource;
 
 /** Turns the game down while you're in another window, and back up when you return. */
 public final class BackgroundAudio {
@@ -34,7 +33,7 @@ public final class BackgroundAudio {
 
 		if (target != multiplier) {
 			multiplier = target;
-			minecraft.getSoundManager().refreshCategoryVolume(SoundSource.MASTER);
+			Mc.refreshMasterVolume(minecraft);
 		}
 	}
 }

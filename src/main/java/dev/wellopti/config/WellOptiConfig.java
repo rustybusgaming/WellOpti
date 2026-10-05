@@ -61,6 +61,9 @@ public final class WellOptiConfig {
 		public int villagers = 48;
 		/** Zombies, skeletons, creepers and other monsters. Bosses are never culled. */
 		public int hostileMobs = 64;
+		public int paintings = 48;
+		/** Minecarts and boats nobody is riding: storage systems and hopper-minecart farms can have hundreds. */
+		public int vehicles = 64;
 	}
 
 	public static final class BlockEntityCulling {
@@ -202,6 +205,8 @@ public final class WellOptiConfig {
 		entityCulling.passiveMobs = clamp(entityCulling.passiveMobs, 0, 1024);
 		entityCulling.villagers = clamp(entityCulling.villagers, 0, 1024);
 		entityCulling.hostileMobs = clamp(entityCulling.hostileMobs, 0, 1024);
+		entityCulling.paintings = clamp(entityCulling.paintings, 0, 1024);
+		entityCulling.vehicles = clamp(entityCulling.vehicles, 0, 1024);
 
 		blockEntityCulling.signText = clamp(blockEntityCulling.signText, 0, 1024);
 		blockEntityCulling.banners = clamp(blockEntityCulling.banners, 0, 1024);

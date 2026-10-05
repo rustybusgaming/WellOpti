@@ -136,5 +136,9 @@
 	"wellopti.memory.low.title": "Minecraft is low on memory",
 	"wellopti.memory.low.message": "Only %s MB is allocated. Set it to 4 GB in your launcher's Java settings for smoother play.",
 	"wellopti.memory.full.title": "Memory is nearly full",
-	"wellopti.memory.full.message": "Minecraft has been using over 90%% of its %s MB for a while. Allocating more in your launcher can stop stutters."
+	"wellopti.memory.full.message": "Minecraft has been using over 90%% of its %s MB for a while. Allocating more in your launcher can stop stutters.",
+	"wellopti.options.entityCulling.paintings": "Paintings",
+	"wellopti.options.entityCulling.paintings.tooltip": "Distance past which paintings aren't drawn.",
+	"wellopti.options.entityCulling.vehicles": "Minecarts & Boats",
+	"wellopti.options.entityCulling.vehicles.tooltip": "Distance past which empty minecarts and boats aren't drawn. Storage systems and hopper-minecart farms can have hundreds. Ones with someone riding are always drawn."
 }

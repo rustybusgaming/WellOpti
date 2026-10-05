@@ -20,7 +20,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ public class WellOptiClient implements ClientModInitializer {
 	 */
 	public static boolean active = true;
 
-	private static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, MOD_ID));
+	private static final KeyMapping.Category KEY_CATEGORY = Mc.keyCategory(MOD_ID);
 	private static KeyMapping toggleKey;
 	private static KeyMapping configKey;
 	private static KeyMapping hudKey;
@@ -50,7 +49,7 @@ public class WellOptiClient implements ClientModInitializer {
 		configKey = Mc.registerKey(new KeyMapping("key.wellopti.config", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
 		hudKey = Mc.registerKey(new KeyMapping("key.wellopti.hud", InputConstants.UNKNOWN.getValue(), KEY_CATEGORY));
 
-		Mc.registerHud(Identifier.fromNamespaceAndPath(MOD_ID, "performance_hud"), new PerformanceHud());
+		Mc.registerHud("performance_hud", new PerformanceHud());
 		ClientTickEvents.END_CLIENT_TICK.register(WellOptiClient::onEndTick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> MemoryAdvisor.onJoin(minecraft));
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));

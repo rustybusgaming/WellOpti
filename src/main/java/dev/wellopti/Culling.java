@@ -1,7 +1,8 @@
 package dev.wellopti;
 
+import dev.wellopti.compat.EntityKinds;
+import dev.wellopti.compat.Shaders;
 import dev.wellopti.config.WellOptiConfig;
-import dev.wellopti.mixin.AbstractArrowAccessor;
 import dev.wellopti.occlusion.OcclusionCuller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -12,21 +13,17 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.ambient.AmbientCreature;
-import net.minecraft.world.entity.animal.fish.AbstractFish;
-import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
@@ -60,7 +57,8 @@ public final class Culling {
 	 */
 	public static boolean isOverCrowdLimit(Entity entity) {
 		int limit = WellOptiConfig.get().mobs.crowdLimit;
-		if (limit <= 0 || !WellOptiClient.active || !(entity instanceof LivingEntity) || entity instanceof Player || isBoss(entity)) {
+		if (limit <= 0 || !WellOptiClient.active || !(entity instanceof LivingEntity) || entity instanceof Player || isBoss(entity)
+			|| Shaders.isRenderingShadowPass()) {
 			return false;
 		}
 
@@ -128,7 +126,8 @@ public final class Culling {
 	 */
 	public static boolean isEntityOccluded(Entity entity, double camX, double camY, double camZ) {
 		WellOptiConfig.OcclusionCulling cfg = WellOptiConfig.get().occlusionCulling;
-		if (!cfg.enabled || !cfg.entities || !WellOptiClient.active) {
+		// In a shader's shadow pass, "hidden from the camera" says nothing about whether the shadow is visible.
+		if (!cfg.enabled || !cfg.entities || !WellOptiClient.active || Shaders.isRenderingShadowPass()) {
 			return false;
 		}
 
@@ -153,7 +152,7 @@ public final class Culling {
 
 	public static boolean isBlockEntityOccluded(BlockEntity blockEntity, Vec3 cameraPos) {
 		WellOptiConfig.OcclusionCulling cfg = WellOptiConfig.get().occlusionCulling;
-		if (!cfg.enabled || !cfg.blockEntities || !WellOptiClient.active || cameraPos == null) {
+		if (!cfg.enabled || !cfg.blockEntities || !WellOptiClient.active || cameraPos == null || Shaders.isRenderingShadowPass()) {
 			return false;
 		}
 
@@ -166,10 +165,13 @@ public final class Culling {
 		if (entity instanceof ExperienceOrb) return cfg.experienceOrbs;
 		if (entity instanceof ItemFrame) return cfg.itemFrames;
 		if (entity instanceof ArmorStand) return cfg.armorStands;
-		if (entity instanceof AbstractArrow arrow) return ((AbstractArrowAccessor) arrow).wellopti$isInGround() ? cfg.stuckArrows : 0;
-		if (entity instanceof AmbientCreature || entity instanceof AbstractFish || entity instanceof Squid) return cfg.ambientMobs;
+		if (EntityKinds.isArrow(entity)) return EntityKinds.isStuckArrow(entity) ? cfg.stuckArrows : 0;
+		if (EntityKinds.isPainting(entity)) return cfg.paintings;
+		// Minecarts and boats, unless something is riding them.
+		if (entity instanceof VehicleEntity) return entity.isVehicle() ? 0 : cfg.vehicles;
+		if (EntityKinds.isAmbientMob(entity)) return cfg.ambientMobs;
 		if (entity instanceof Player || isBoss(entity) || entity.hasCustomName()) return 0;
-		if (entity instanceof AbstractVillager) return cfg.villagers;
+		if (EntityKinds.isVillager(entity)) return cfg.villagers;
 		if (entity instanceof Enemy) return cfg.hostileMobs;
 		if (entity instanceof Animal) return cfg.passiveMobs;
 		return 0;

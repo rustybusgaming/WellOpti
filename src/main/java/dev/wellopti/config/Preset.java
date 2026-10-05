@@ -10,7 +10,7 @@ public enum Preset {
 	QUALITY {
 		@Override
 		void configure(WellOptiConfig cfg) {
-			entities(cfg, 64, 48, 64, 96, 48, 64, 64, 64, 96);
+			entities(cfg, 64, 48, 64, 96, 48, 64, 64, 64, 96, 64, 96);
 			blockEntities(cfg, 48, 64, 48, 64, 48, 48);
 			mobs(cfg, 48, 48, 16);
 			particles(cfg, 8000, 48, 100);
@@ -21,7 +21,7 @@ public enum Preset {
 	BALANCED {
 		@Override
 		void configure(WellOptiConfig cfg) {
-			entities(cfg, 48, 32, 48, 64, 24, 48, 48, 48, 64);
+			entities(cfg, 48, 32, 48, 64, 24, 48, 48, 48, 64, 48, 64);
 			blockEntities(cfg, 24, 48, 32, 48, 32, 32);
 			mobs(cfg, 32, 32, 8);
 			particles(cfg, 4000, 32, 100);
@@ -32,7 +32,7 @@ public enum Preset {
 	PERFORMANCE {
 		@Override
 		void configure(WellOptiConfig cfg) {
-			entities(cfg, 32, 24, 32, 48, 16, 32, 32, 32, 48);
+			entities(cfg, 32, 24, 32, 48, 16, 32, 32, 32, 48, 32, 48);
 			blockEntities(cfg, 16, 32, 24, 32, 24, 24);
 			mobs(cfg, 24, 24, 4);
 			particles(cfg, 2000, 24, 75);
@@ -43,7 +43,7 @@ public enum Preset {
 	POTATO {
 		@Override
 		void configure(WellOptiConfig cfg) {
-			entities(cfg, 24, 16, 24, 32, 12, 24, 24, 24, 32);
+			entities(cfg, 24, 16, 24, 32, 12, 24, 24, 24, 32, 24, 32);
 			blockEntities(cfg, 12, 24, 16, 24, 16, 16);
 			mobs(cfg, 16, 16, 2);
 			particles(cfg, 1000, 16, 50);
@@ -74,7 +74,8 @@ public enum Preset {
 	}
 
 	private static void entities(
-		WellOptiConfig cfg, int items, int xp, int frames, int stands, int arrows, int ambient, int passive, int villagers, int hostile
+		WellOptiConfig cfg, int items, int xp, int frames, int stands, int arrows, int ambient, int passive, int villagers, int hostile,
+		int paintings, int vehicles
 	) {
 		WellOptiConfig.EntityCulling e = cfg.entityCulling;
 		e.droppedItems = items;
@@ -86,6 +87,8 @@ public enum Preset {
 		e.passiveMobs = passive;
 		e.villagers = villagers;
 		e.hostileMobs = hostile;
+		e.paintings = paintings;
+		e.vehicles = vehicles;
 	}
 
 	private static void blockEntities(WellOptiConfig cfg, int signs, int banners, int skulls, int storage, int displays, int spawners) {

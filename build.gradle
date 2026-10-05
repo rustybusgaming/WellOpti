@@ -32,6 +32,8 @@ group = project.maven_group
 sourceSets {
 	main {
 		java.srcDir "src/compat/${project.compat}/java"
+		// Mob classes moved package in 1.21.11; this picks the matching set of entity checks.
+		java.srcDir "src/layout/${project.entity_layout}/java"
 	}
 }
 
@@ -65,8 +67,11 @@ dependencies {
 		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 		modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
-		if (project.hasProperty("withSodium")) {
+		if (project.hasProperty("withSodium") || project.hasProperty("withIris")) {
 			modLocalRuntime "maven.modrinth:sodium:${project.sodium_version}"
+		}
+		if (project.hasProperty("withIris")) {
+			modLocalRuntime "maven.modrinth:iris:${project.iris_version}"
 		}
 	} else {
 		implementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -75,9 +80,13 @@ dependencies {
 		// Optional: only used to add a config button in Mod Menu.
 		compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-		// Opt-in: `./gradlew runClient -PwithSodium` launches the dev client with Sodium to check compatibility.
-		if (project.hasProperty("withSodium")) {
+		// Opt-in: `./gradlew runClient -PwithSodium` (or -PwithIris, which needs Sodium too) launches the dev
+		// client with those mods to check compatibility.
+		if (project.hasProperty("withSodium") || project.hasProperty("withIris")) {
 			localRuntime "maven.modrinth:sodium:${project.sodium_version}"
+		}
+		if (project.hasProperty("withIris")) {
+			localRuntime "maven.modrinth:iris:${project.iris_version}"
 		}
 	}
 
