@@ -6,7 +6,10 @@ All notable changes to WellOpti. Each release's section is used as its release n
 
 ### Added
 - Minecraft 1.21.9 and 1.21.10 support (one jar for both).
+- Hidden entities update less often: entities WellOpti isn't drawing (behind walls, too far away, or over a farm's crowd limit) tick 5 times a second on your client instead of 20, and catch up as soon as they're visible. The server still runs every mob normally. Players, anything being ridden, and nearby or glowing entities always tick normally.
+- Presets are remembered per server: pick one while connected and it's switched back on next time you join that server. Singleplayer counts as one.
 - Distance culling for paintings, and for minecarts and boats nobody is riding.
+- French, Russian, Japanese and Korean translations.
 - This changelog, used for release notes.
 
 ### Fixed

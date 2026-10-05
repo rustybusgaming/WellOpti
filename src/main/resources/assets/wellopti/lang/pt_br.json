@@ -136,5 +136,14 @@
 	"wellopti.benchmark.noToggle": "Não dá para ligar/desligar o WellOpti durante um benchmark",
 	"wellopti.benchmark.cancelled.manual": "Benchmark cancelado.",
 	"wellopti.benchmark.cancelled.leftWorld": "Benchmark cancelado: você saiu do mundo.",
-	"wellopti.benchmark.cancelled.menu": "Benchmark cancelado: um menu abriu ou a janela perdeu o foco, o que muda o FPS de propósito. Tente de novo e deixe o jogo em primeiro plano."
+	"wellopti.benchmark.cancelled.menu": "Benchmark cancelado: um menu abriu ou a janela perdeu o foco, o que muda o FPS de propósito. Tente de novo e deixe o jogo em primeiro plano.",
+	"wellopti.options.entityCulling.paintings": "Pinturas",
+	"wellopti.options.entityCulling.paintings.tooltip": "Distância a partir da qual pinturas não são desenhadas.",
+	"wellopti.options.entityCulling.vehicles": "Carrinhos e barcos",
+	"wellopti.options.entityCulling.vehicles.tooltip": "Distância a partir da qual carrinhos e barcos vazios não são desenhados. Sistemas de armazenamento e farms de carrinho com funil podem ter centenas. Os que têm alguém dentro sempre são desenhados.",
+	"wellopti.options.entityCulling.throttleHiddenTicks": "Desacelerar entidades escondidas",
+	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Entidades que o WellOpti não está desenhando (atrás de paredes, longe demais ou acima do limite de multidão de uma farm) atualizam 5 vezes por segundo na sua tela em vez de 20. Assim que ficam visíveis de novo, elas se atualizam. O servidor continua rodando cada criatura normalmente, então farms e o jogo não mudam. Jogadores, o que alguém está montando e entidades próximas sempre atualizam normalmente.",
+	"wellopti.options.perServerPresets": "Lembrar predefinição por servidor",
+	"wellopti.options.perServerPresets.tooltip": "Quando você escolhe uma predefinição jogando, o WellOpti lembra dela para aquele servidor (o modo um jogador conta como um) e volta a usá-la sempre que você entrar lá.",
+	"wellopti.preset.restored": "WellOpti: usando a predefinição %s neste servidor"
 }

@@ -47,6 +47,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 				.build());
 		}
 		this.list.addSmall(presetButtons);
+		this.list.addBig(toggle("wellopti.options.perServerPresets", cfg.perServerPresets, v -> cfg.perServerPresets = v));
 
 		Button benchmark = Button.builder(Component.translatable("wellopti.options.benchmark"), button -> {
 				this.onClose();
@@ -78,6 +79,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			toggle("wellopti.options.entityCulling.enabled", entities.enabled, v -> entities.enabled = v),
 			toggle("wellopti.options.disableWhileScoping", entities.disableWhileScoping, v -> entities.disableWhileScoping = v)
 		);
+		this.list.addBig(toggle("wellopti.options.entityCulling.throttleHiddenTicks", entities.throttleHiddenTicks, v -> entities.throttleHiddenTicks = v));
 		this.list.addSmall(
 			distance("wellopti.options.entityCulling.droppedItems", entities.droppedItems, v -> entities.droppedItems = v),
 			distance("wellopti.options.entityCulling.experienceOrbs", entities.experienceOrbs, v -> entities.experienceOrbs = v),

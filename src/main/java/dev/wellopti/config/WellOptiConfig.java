@@ -9,6 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
@@ -31,6 +33,10 @@ public final class WellOptiConfig {
 	public Adaptive adaptive = new Adaptive();
 	/** Show a toast if the game has very little memory, or memory stays nearly full. */
 	public boolean memoryAdvisor = true;
+	/** Remember the preset picked on each server (and in singleplayer) and switch to it when you join. */
+	public boolean perServerPresets = true;
+	/** Server key ("singleplayer" or "server:<address>") to preset id. */
+	public Map<String, String> serverPresets = new LinkedHashMap<>();
 
 	public static final class DynamicFps {
 		/** Lower the frame rate when the game window isn't focused or is minimised. */
@@ -64,6 +70,8 @@ public final class WellOptiConfig {
 		public int paintings = 48;
 		/** Minecarts and boats nobody is riding: storage systems and hopper-minecart farms can have hundreds. */
 		public int vehicles = 64;
+		/** Tick entities WellOpti is hiding once every 4 client ticks instead of every tick. */
+		public boolean throttleHiddenTicks = true;
 	}
 
 	public static final class BlockEntityCulling {
@@ -191,6 +199,9 @@ public final class WellOptiConfig {
 		if (hud.corner == null) hud.corner = HudCorner.TOP_LEFT;
 		if (mobs == null) mobs = new Mobs();
 		if (adaptive == null) adaptive = new Adaptive();
+		serverPresets = serverPresets == null ? new LinkedHashMap<>() : new LinkedHashMap<>(serverPresets);
+		// Drop entries for presets that don't exist (hand edits, or a preset removed in a future version).
+		serverPresets.values().removeIf(id -> Preset.byId(id).isEmpty());
 
 		dynamicFps.unfocusedFps = clamp(dynamicFps.unfocusedFps, 1, 260);
 		dynamicFps.minimizedFps = clamp(dynamicFps.minimizedFps, 1, 260);

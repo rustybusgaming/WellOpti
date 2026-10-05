@@ -136,5 +136,14 @@
 	"wellopti.benchmark.noToggle": "WellOpti kann während eines Benchmarks nicht umgeschaltet werden",
 	"wellopti.benchmark.cancelled.manual": "Benchmark abgebrochen.",
 	"wellopti.benchmark.cancelled.leftWorld": "Benchmark abgebrochen: Du hast die Welt verlassen.",
-	"wellopti.benchmark.cancelled.menu": "Benchmark abgebrochen: Ein Menü wurde geöffnet oder das Fenster hat den Fokus verloren, was die FPS absichtlich ändert. Versuch es erneut und lass das Spiel im Vordergrund."
+	"wellopti.benchmark.cancelled.menu": "Benchmark abgebrochen: Ein Menü wurde geöffnet oder das Fenster hat den Fokus verloren, was die FPS absichtlich ändert. Versuch es erneut und lass das Spiel im Vordergrund.",
+	"wellopti.options.entityCulling.paintings": "Gemälde",
+	"wellopti.options.entityCulling.paintings.tooltip": "Entfernung, ab der Gemälde nicht gezeichnet werden.",
+	"wellopti.options.entityCulling.vehicles": "Loren & Boote",
+	"wellopti.options.entityCulling.vehicles.tooltip": "Entfernung, ab der leere Loren und Boote nicht gezeichnet werden. Lagersysteme und Trichterloren-Farmen können Hunderte davon haben. Solche, in denen jemand sitzt, werden immer gezeichnet.",
+	"wellopti.options.entityCulling.throttleHiddenTicks": "Verdeckte Objekte verlangsamen",
+	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Objekte, die WellOpti nicht zeichnet (hinter Wänden, zu weit weg oder über dem Gedränge-Limit einer Farm), werden bei dir 5-mal pro Sekunde statt 20-mal aktualisiert. Sobald sie wieder sichtbar sind, holen sie auf. Der Server führt jeden Mob ganz normal aus, Farmen und Spielablauf ändern sich also nicht. Spieler, Gerittenes und nahe Objekte werden immer normal aktualisiert.",
+	"wellopti.options.perServerPresets": "Voreinstellung pro Server merken",
+	"wellopti.options.perServerPresets.tooltip": "Wenn du beim Spielen eine Voreinstellung wählst, merkt sich WellOpti sie für diesen Server (Einzelspieler zählt als einer) und wechselt bei jedem Beitritt wieder dorthin.",
+	"wellopti.preset.restored": "WellOpti: Voreinstellung %s für diesen Server aktiv"
 }

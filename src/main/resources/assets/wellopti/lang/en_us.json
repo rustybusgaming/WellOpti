@@ -140,5 +140,10 @@
 	"wellopti.options.entityCulling.paintings": "Paintings",
 	"wellopti.options.entityCulling.paintings.tooltip": "Distance past which paintings aren't drawn.",
 	"wellopti.options.entityCulling.vehicles": "Minecarts & Boats",
-	"wellopti.options.entityCulling.vehicles.tooltip": "Distance past which empty minecarts and boats aren't drawn. Storage systems and hopper-minecart farms can have hundreds. Ones with someone riding are always drawn."
+	"wellopti.options.entityCulling.vehicles.tooltip": "Distance past which empty minecarts and boats aren't drawn. Storage systems and hopper-minecart farms can have hundreds. Ones with someone riding are always drawn.",
+	"wellopti.options.entityCulling.throttleHiddenTicks": "Slow Down Hidden Entities",
+	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Entities WellOpti isn't drawing (behind walls, too far away, or over a farm's crowd limit) update 5 times a second on your screen instead of 20. They catch up the moment they're visible again. The server still runs every mob normally, so farms and gameplay don't change. Players, anything being ridden and nearby entities always update normally.",
+	"wellopti.options.perServerPresets": "Remember Preset Per Server",
+	"wellopti.options.perServerPresets.tooltip": "When you pick a preset while playing, WellOpti remembers it for that server (singleplayer counts as one) and switches back to it whenever you join there again.",
+	"wellopti.preset.restored": "WellOpti: using the %s preset for this server"
 }

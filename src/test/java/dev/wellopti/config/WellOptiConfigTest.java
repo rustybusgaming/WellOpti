@@ -75,6 +75,25 @@ class WellOptiConfigTest {
 		assertEquals(WellOptiConfig.HudCorner.TOP_LEFT, cfg.hud.corner);
 	}
 
+	@Test
+	void serverPresetsSurviveRoundTripAndDropUnknownIds() {
+		WellOptiConfig cfg = GSON.fromJson(
+			"{\"serverPresets\": {\"singleplayer\": \"quality\", \"server:mc.example.net\": \"potato\", \"server:old\": \"turbo\"}}",
+			WellOptiConfig.class);
+		cfg.sanitize();
+		assertEquals("quality", cfg.serverPresets.get("singleplayer"));
+		assertEquals("potato", cfg.serverPresets.get("server:mc.example.net"));
+		assertEquals(false, cfg.serverPresets.containsKey("server:old"), "an unknown preset id is dropped");
+		assertEquals(Preset.POTATO, Preset.byId("potato").orElseThrow());
+	}
+
+	@Test
+	void missingServerPresetsMapIsCreated() {
+		WellOptiConfig cfg = GSON.fromJson("{\"serverPresets\": null}", WellOptiConfig.class);
+		cfg.sanitize();
+		assertNotNull(cfg.serverPresets);
+	}
+
 	private static void assertLessOrEqual(int actual, int limit, String message) {
 		if (actual > limit) {
 			throw new AssertionError(message + ": expected " + actual + " <= " + limit);

@@ -2,6 +2,7 @@ package dev.wellopti.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.wellopti.Culling;
+import dev.wellopti.TickThrottle;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,7 @@ public abstract class EntityRenderDispatcherMixin {
 		@Local(argsOnly = true, ordinal = 2) double camZ
 	) {
 		if (Culling.shouldCullEntity(entity, camX, camY, camZ)) {
+			TickThrottle.markHidden(entity);
 			cir.setReturnValue(false);
 		}
 	}
@@ -41,6 +43,7 @@ public abstract class EntityRenderDispatcherMixin {
 		@Local(argsOnly = true, ordinal = 2) double camZ
 	) {
 		if (cir.getReturnValueZ() && (Culling.isEntityOccluded(entity, camX, camY, camZ) || Culling.isOverCrowdLimit(entity))) {
+			TickThrottle.markHidden(entity);
 			cir.setReturnValue(false);
 		}
 	}

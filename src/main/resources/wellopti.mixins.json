@@ -5,6 +5,7 @@
 	"client": [
 		"AbstractArrowAccessor",
 		"BlockEntityRenderDispatcherMixin",
+		"ClientLevelMixin",
 		"EntityRenderDispatcherMixin",
 		"EntityRendererMixin",
 		"FrameStartMixin",

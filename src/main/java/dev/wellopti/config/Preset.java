@@ -1,6 +1,7 @@
 package dev.wellopti.config;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * One-click bundles of settings, from "barely noticeable" to "anything for frames".
@@ -56,6 +57,15 @@ public enum Preset {
 
 	public String id() {
 		return name().toLowerCase(Locale.ROOT);
+	}
+
+	public static Optional<Preset> byId(String id) {
+		for (Preset preset : values()) {
+			if (preset.id().equals(id)) {
+				return Optional.of(preset);
+			}
+		}
+		return Optional.empty();
 	}
 
 	public String translationKey() {

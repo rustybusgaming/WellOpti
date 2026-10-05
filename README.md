@@ -6,7 +6,7 @@ WellOpti skips work your PC doesn't need to do: it doesn't draw things too far a
 it stops particle floods, and it stops rendering at full speed when you aren't looking at the game.
 Everything it does is visual only. The world, farms and redstone behave exactly like vanilla.
 
-**Minecraft 1.21.11 and 26.1 – 26.3 · Fabric Loader 0.19.5+ · Fabric API**
+**Minecraft 1.21.9 – 1.21.11 and 26.1 – 26.3 · Fabric Loader 0.19.5+ · Fabric API**
 
 ## Supported versions
 
@@ -18,9 +18,10 @@ Download the jar that matches your Minecraft version. Each one is built and chec
 | 26.2 | `wellopti-<version>+26.2.jar` |
 | 26.1, 26.1.1, 26.1.2 | `wellopti-<version>+26.1.2.jar` |
 | 1.21.11 | `wellopti-<version>+1.21.11.jar` |
+| 1.21.9, 1.21.10 | `wellopti-<version>+1.21.10.jar` |
 
 Every feature works the same on all of them. The 26.x jars need Java 25 (what those Minecraft versions ship with);
-the 1.21.11 jar runs on Java 21.
+the 1.21.x jars run on Java 21.
 
 ## What it does
 
@@ -32,7 +33,8 @@ the 1.21.11 jar runs on Java 21.
 | **Crowd limit** | Draws at most a few mobs per block. Mob farms cram dozens of chickens, cows or villagers into one block, where you can't tell 8 from 80. The mobs are all still there; only the drawing is skipped. | 8 per block |
 | **Far-mob detail** | Past a set distance, mobs skip their armor, held items, elytra, heads and saddles. Body details like sheep wool and villager outfits always draw, and so does players' gear. | 32 blocks |
 | **Mob name tags** | Shortens how far away mob name tags are drawn (vanilla: 64 blocks). Players' name tags are left alone. | 32 blocks |
-| **Entity culling** | Stops drawing dropped items, XP orbs, item frames, armor stands, arrows stuck in blocks, and ambient mobs (bats, fish, squid) past a set distance. Useful near mob farms, storage halls and item sorters. Glowing entities and arrows in flight are always drawn. | items 48, XP 32, frames 48, stands 64, stuck arrows 24, ambient mobs 48 blocks |
+| **Entity culling** | Stops drawing dropped items, XP orbs, item frames, armor stands, paintings, arrows stuck in blocks, empty minecarts and boats, and ambient mobs (bats, fish, squid) past a set distance. Useful near mob farms, storage halls, item sorters and minecart systems. Glowing entities, arrows in flight and anything being ridden are always drawn. | items 48, XP 32, frames 48, stands 64, paintings 48, stuck arrows 24, minecarts & boats 64, ambient mobs 48 blocks |
+| **Slower updates for hidden entities** | Entities WellOpti isn't drawing (behind walls, too far away, or over a farm's crowd limit) update 5 times a second on your client instead of 20, and catch up as soon as they're visible. The server still runs every mob normally, so farms don't change. Players, anything being ridden, and nearby or glowing entities always update normally. | on |
 | **Block entity culling** | Stops drawing sign text, banners, heads, chests and shulker boxes, items on shelves, campfires and pots, and spawners (with their little spinning mob), past a set distance. Vanilla draws all of these out to 64 blocks. | signs 24, banners 48, heads 32, storage 48, displays 32, spawners 32 blocks |
 | **Particle cap** | Puts a hard limit on live particles, so TNT, explosions and particle-spamming servers can't tank your FPS. Item pickup animations always get through. | 4000 particles |
 | **Ambient particles** | Decorative particles (campfire smoke, rain splashes, drips, spores, falling leaves, ash, bubble columns, fireflies) only spawn near you, and you can thin them out. Particles that tell you something (hits, potions, explosions, block breaking) are never touched. | within 32 blocks, 100% density |
@@ -53,7 +55,9 @@ Anything without a fresh answer is drawn rather than guessed at. Players are nev
 
 ## Presets
 
-Pick one with the buttons at the top of the settings screen (Mod Menu's config button, `/wellopti config`, or the settings key):
+Pick one with the buttons at the top of the settings screen (Mod Menu's config button, `/wellopti config`, or the settings key).
+WellOpti remembers the preset you pick on each server (singleplayer counts as one) and switches back to it when you join there again,
+so you can use Potato on a laggy server and Quality in singleplayer. Turn that off with *Remember Preset Per Server*.
 
 | Preset | For |
 | --- | --- |
@@ -101,8 +105,14 @@ The toggle isn't saved: WellOpti is always on when you start the game.
 
 ## Works with Sodium
 
-WellOpti is tested to load alongside Sodium on every supported version (0.8.14 on 1.21.11, 0.9.2 on 26.x),
+WellOpti is tested to load alongside Sodium on every supported version (0.7.3 on 1.21.9–1.21.10, 0.8.14 on 1.21.11, 0.9.2 on 26.x),
 with all of both mods' changes applied and no conflicts.
+
+## Works with shaders (Iris)
+
+WellOpti is tested to load alongside Iris and Sodium on every supported version. Shaders draw a shadow pass from the sun's point of view;
+during it, WellOpti doesn't hide mobs that are only hidden from *your camera*, so they keep their shadows. Distance culling still applies,
+since a mob too far away to draw is too far for its shadow to matter. To try it in a dev client: `./gradlew runClient -PwithIris`.
 Sodium makes chunks draw faster; WellOpti decides which entities and block entities are worth drawing at all. The two stack.
 To try it in a dev client: `./gradlew runClient -PwithSodium`.
 
@@ -110,7 +120,7 @@ To try it in a dev client: `./gradlew runClient -PwithSodium`.
 
 ## Languages
 
-English, Deutsch, Español, Português (Brasil) and 简体中文. Corrections and new languages are welcome:
+English, Deutsch, Español, Français, Português (Brasil), Русский, 日本語, 한국어 and 简体中文. Corrections and new languages are welcome:
 copy `src/main/resources/assets/wellopti/lang/en_us.json`, translate the values, and `./gradlew test` checks that nothing's missing a placeholder.
 
 ## Pair it with

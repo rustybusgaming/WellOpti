@@ -7,21 +7,22 @@ public final class WellOptiStats {
 	public static long occluded;
 	public static long droppedParticles;
 	public static long crowded;
+	public static long throttledTicks;
 
 	/** Totals at the last {@code /wellopti stats} call. */
-	private static final long[] commandBaseline = new long[5];
+	private static final long[] commandBaseline = new long[6];
 	private static long commandSince = System.nanoTime();
 
 	/** Totals at the start of the current one-second HUD window, and the per-second rates from the last full window. */
-	private static final long[] hudBaseline = new long[5];
+	private static final long[] hudBaseline = new long[6];
 	private static long hudWindowStart = System.nanoTime();
-	private static final long[] perSecond = new long[5];
+	private static final long[] perSecond = new long[6];
 
 	private WellOptiStats() {
 	}
 
 	private static long[] totals() {
-		return new long[] {culledEntities, culledBlockEntities, occluded, droppedParticles, crowded};
+		return new long[] {culledEntities, culledBlockEntities, occluded, droppedParticles, crowded, throttledTicks};
 	}
 
 	/** Rolls the HUD's one-second window. Call every client tick. */
@@ -60,16 +61,20 @@ public final class WellOptiStats {
 		return perSecond[4];
 	}
 
-	/** Returns {entities, blockEntities, occluded, particles, crowded, seconds} since the last call, then starts a new window. */
+	public static long throttledTicksPerSecond() {
+		return perSecond[5];
+	}
+
+	/** Returns {entities, blockEntities, occluded, particles, crowded, throttledTicks, seconds} since the last call, then starts a new window. */
 	public static double[] sinceLastCommand() {
 		long now = System.nanoTime();
 		long[] totals = totals();
-		double[] result = new double[6];
+		double[] result = new double[7];
 		for (int i = 0; i < totals.length; i++) {
 			result[i] = totals[i] - commandBaseline[i];
 			commandBaseline[i] = totals[i];
 		}
-		result[5] = Math.max(1e-3, (now - commandSince) / 1e9);
+		result[6] = Math.max(1e-3, (now - commandSince) / 1e9);
 		commandSince = now;
 		return result;
 	}

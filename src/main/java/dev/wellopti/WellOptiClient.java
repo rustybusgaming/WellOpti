@@ -51,7 +51,10 @@ public class WellOptiClient implements ClientModInitializer {
 
 		Mc.registerHud("performance_hud", new PerformanceHud());
 		ClientTickEvents.END_CLIENT_TICK.register(WellOptiClient::onEndTick);
-		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> MemoryAdvisor.onJoin(minecraft));
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> {
+			MemoryAdvisor.onJoin(minecraft);
+			ServerPresets.joinedServer();
+		});
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> registerCommands(dispatcher));
 		LOGGER.info("WellOpti loaded. Minecraft is now running very goodly.");
 	}
@@ -62,6 +65,7 @@ public class WellOptiClient implements ClientModInitializer {
 		WellOptiStats.tick();
 		BackgroundAudio.tick(minecraft);
 		Benchmark.tick(minecraft);
+		ServerPresets.tick(minecraft);
 		MemoryAdvisor.tick(minecraft);
 
 		while (hudKey.consumeClick()) {
@@ -129,6 +133,9 @@ public class WellOptiClient implements ClientModInitializer {
 						+ (cfg.occlusionCulling.blockEntities ? "block entities" : "")));
 				source.sendFeedback(Component.literal("Background volume: unfocused " + cfg.backgroundAudio.unfocusedVolume
 					+ "%, minimised " + cfg.backgroundAudio.minimizedVolume + "%").withStyle(ChatFormatting.GRAY));
+				ServerPresets.rememberedHere(source.getClient()).ifPresent(preset -> source.sendFeedback(
+					Component.literal("Preset remembered for this server: ").append(Component.translatable(preset.translationKey()))
+						.withStyle(ChatFormatting.GRAY)));
 				source.sendFeedback(Component.literal("/wellopti config to change settings").withStyle(ChatFormatting.GRAY));
 				return 1;
 			})
@@ -163,8 +170,9 @@ public class WellOptiClient implements ClientModInitializer {
 				double[] s = WellOptiStats.sinceLastCommand();
 				ctx.getSource().sendFeedback(Component.literal(String.format(
 					"Over the last %.0fs WellOpti skipped %,.0f far entity draws, %,.0f far block entity draws, "
-						+ "%,.0f draws of things hidden behind walls, %,.0f draws of crowded mobs, and %,.0f particles.",
-					s[5], s[0], s[1], s[2], s[4], s[3])));
+						+ "%,.0f draws of things hidden behind walls, %,.0f draws of crowded mobs, %,.0f particles, "
+						+ "and %,.0f client ticks of hidden entities.",
+					s[6], s[0], s[1], s[2], s[4], s[3], s[5])));
 				return 1;
 			})));
 	}
@@ -173,6 +181,7 @@ public class WellOptiClient implements ClientModInitializer {
 	public static void applyPreset(Preset preset) {
 		WellOptiConfig cfg = WellOptiConfig.get();
 		preset.applyTo(cfg);
+		ServerPresets.remember(Minecraft.getInstance(), preset);
 		cfg.save();
 	}
 

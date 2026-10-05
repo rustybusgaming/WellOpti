@@ -54,6 +54,7 @@ public final class PerformanceHud {
 			lines.add(new Line(String.format(" %d hidden behind walls", WellOptiStats.occludedPerSecond() / frames), TEXT));
 			lines.add(new Line(String.format(" %d crowded mobs", WellOptiStats.crowdedPerSecond() / frames), TEXT));
 			lines.add(new Line(String.format(" %d particles/s blocked", WellOptiStats.particlesPerSecond()), TEXT));
+			lines.add(new Line(String.format(" %d hidden entity ticks/s saved", WellOptiStats.throttledTicksPerSecond()), TEXT));
 		}
 
 		if (WellOptiConfig.get().adaptive.enabled) {

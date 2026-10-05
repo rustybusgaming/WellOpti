@@ -136,5 +136,14 @@
 	"wellopti.benchmark.noToggle": "基准测试运行期间无法开关 WellOpti",
 	"wellopti.benchmark.cancelled.manual": "基准测试已取消。",
 	"wellopti.benchmark.cancelled.leftWorld": "基准测试已取消：你离开了世界。",
-	"wellopti.benchmark.cancelled.menu": "基准测试已取消：打开了菜单或窗口失去焦点，这会刻意改变帧率。请重试，并让游戏保持在前台。"
+	"wellopti.benchmark.cancelled.menu": "基准测试已取消：打开了菜单或窗口失去焦点，这会刻意改变帧率。请重试，并让游戏保持在前台。",
+	"wellopti.options.entityCulling.paintings": "画",
+	"wellopti.options.entityCulling.paintings.tooltip": "超过此距离不绘制画。",
+	"wellopti.options.entityCulling.vehicles": "矿车和船",
+	"wellopti.options.entityCulling.vehicles.tooltip": "超过此距离不绘制空的矿车和船。仓储系统和漏斗矿车农场里可能有数百辆。有人乘坐的始终绘制。",
+	"wellopti.options.entityCulling.throttleHiddenTicks": "降低隐藏实体的更新频率",
+	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "WellOpti 没有绘制的实体（在墙后、太远或超过农场拥挤上限）在你的画面上每秒更新 5 次而不是 20 次。一旦重新可见就会立刻追上。服务器仍然正常运行每个生物，所以农场和游戏玩法不受影响。玩家、正被乘坐的东西和附近的实体始终正常更新。",
+	"wellopti.options.perServerPresets": "按服务器记住预设",
+	"wellopti.options.perServerPresets.tooltip": "在游戏中选择预设时，WellOpti 会为该服务器（单人游戏算作一个）记住它，并在你每次进入时自动切换回来。",
+	"wellopti.preset.restored": "WellOpti：此服务器使用「%s」预设"
 }

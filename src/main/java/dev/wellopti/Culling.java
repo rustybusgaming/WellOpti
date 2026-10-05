@@ -49,6 +49,7 @@ public final class Culling {
 	/** Called at the start of each frame's entity pass. */
 	public static void beginFrame() {
 		CROWD.clear();
+		TickThrottle.beginFrame();
 	}
 
 	/**
