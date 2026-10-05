@@ -32,7 +32,7 @@ it draws things rather than guessing. Players are never hidden, because their na
 
 ## Presets
 
-Pick one in the settings screen or with `/wellopti preset <name>`:
+Pick one with the buttons at the top of the settings screen (Mod Menu's config button, `/wellopti config`, or the settings key):
 
 | Preset | For |
 | --- | --- |
@@ -61,7 +61,6 @@ The toggle isn't saved: WellOpti is always on when you start the game.
 - `/wellopti`: show what's turned on and the current distances
 - `/wellopti config`: open the settings screen
 - `/wellopti toggle`: same as pressing F7
-- `/wellopti preset <quality|balanced|performance|potato>`: apply a preset
 - `/wellopti hud`: show or hide the performance HUD (there's also a rebindable key, unbound by default)
 - `/wellopti reload`: reload `config/wellopti.json` without restarting
 - `/wellopti stats`: show how many draws and particles WellOpti skipped since you last checked

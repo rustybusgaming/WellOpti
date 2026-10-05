@@ -4,7 +4,6 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.wellopti.audio.BackgroundAudio;
 import dev.wellopti.config.Preset;
 import dev.wellopti.config.WellOptiConfig;
@@ -125,7 +124,6 @@ public class WellOptiClient implements ClientModInitializer {
 				openConfigNextTick = true;
 				return 1;
 			}))
-			.then(presetCommand())
 			.then(literal("hud").executes(ctx -> {
 				toggleHud(ctx.getSource().getClient());
 				ctx.getSource().sendFeedback(Component.literal("Performance HUD " + (WellOptiConfig.get().hud.enabled ? "shown." : "hidden.")));
@@ -150,19 +148,7 @@ public class WellOptiClient implements ClientModInitializer {
 			})));
 	}
 
-	private static LiteralArgumentBuilder<FabricClientCommandSource> presetCommand() {
-		LiteralArgumentBuilder<FabricClientCommandSource> command = literal("preset");
-		for (Preset preset : Preset.values()) {
-			command.then(literal(preset.id()).executes(ctx -> {
-				applyPreset(preset);
-				ctx.getSource().sendFeedback(Component.translatable("wellopti.preset.applied", Component.translatable(preset.translationKey()))
-					.withStyle(ChatFormatting.GREEN));
-				return 1;
-			}));
-		}
-		return command;
-	}
-
+	/** Used by the preset buttons on the settings screen. */
 	public static void applyPreset(Preset preset) {
 		WellOptiConfig cfg = WellOptiConfig.get();
 		preset.applyTo(cfg);

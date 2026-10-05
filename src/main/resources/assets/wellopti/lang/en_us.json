@@ -53,7 +53,6 @@
 	"key.wellopti.hud": "Toggle Performance HUD",
 	"wellopti.options.percent": "%s%%",
 	"wellopti.options.presets": "Presets",
-	"wellopti.preset.applied": "Applied the %s preset.",
 	"wellopti.preset.quality": "Quality",
 	"wellopti.preset.quality.tooltip": "Light touch. Culls only at long range, so you'll barely notice anything missing.",
 	"wellopti.preset.balanced": "Balanced",
