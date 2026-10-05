@@ -3,8 +3,30 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.mod_version
+// Load the per-Minecraft-version settings (versions/<mc>.properties) into the project's properties.
+def mcTarget = project.property("mc").toString()
+def versionFile = file("versions/${mcTarget}.properties")
+if (!versionFile.exists()) {
+	throw new GradleException("No versions/${mcTarget}.properties. Supported: ${project.supported_versions}")
+}
+def versionProps = new Properties()
+versionFile.withInputStream { versionProps.load(it) }
+// A -P on the command line still wins, e.g. -Pfabric_api_version=... to try a newer Fabric API.
+versionProps.each { key, value ->
+	if (!project.hasProperty(key as String)) {
+		project.ext.set(key as String, value)
+	}
+}
+
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
+
+// Code that differs between Minecraft versions lives in src/compat/<name>; everything else is shared.
+sourceSets {
+	main {
+		java.srcDir "src/compat/${project.compat}/java"
+	}
+}
 
 base {
 	archivesName = project.archives_base_name
@@ -54,11 +76,12 @@ processResources {
 	inputs.property "version", project.version
 	inputs.property "minecraft_version", project.minecraft_version
 	inputs.property "loader_version", project.loader_version
+	inputs.property "minecraft_dependency", project.minecraft_dependency
 	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version,
-			"minecraft_version": project.minecraft_version,
+			"minecraft_dependency": project.minecraft_dependency,
 			"loader_version": project.loader_version
 	}
 }
@@ -79,5 +102,24 @@ jar {
 	inputs.property "archivesName", project.base.archivesName
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}" }
+	}
+}
+
+// Builds a jar for every supported Minecraft version into build/libs, one Gradle run each.
+tasks.register("buildAllVersions") {
+	group = "build"
+	description = "Builds WellOpti for every Minecraft version in supported_versions."
+	doLast {
+		project.supported_versions.split(",").each { target ->
+			def result = project.providers.exec {
+				workingDir = project.rootDir
+				commandLine "${project.rootDir}/gradlew", "build", "-Pmc=${target.trim()}", "--console=plain"
+				ignoreExitValue = true
+			}
+			if (result.result.get().exitValue != 0) {
+				throw new GradleException("Build for Minecraft ${target} failed:\n" + result.standardOutput.asText.get() + result.standardError.asText.get())
+			}
+			println "Built Minecraft ${target}"
+		}
 	}
 }

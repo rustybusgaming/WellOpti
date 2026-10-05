@@ -1,5 +1,6 @@
 package dev.wellopti.hud;
 
+import dev.wellopti.compat.Mc;
 import dev.wellopti.AdaptiveDistance;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.WellOptiStats;
@@ -30,7 +31,7 @@ public final class PerformanceHud implements HudElement {
 	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
 		Minecraft minecraft = Minecraft.getInstance();
 		WellOptiConfig.Hud cfg = WellOptiConfig.get().hud;
-		if (!cfg.enabled || minecraft.gui.hud.isHidden() || minecraft.getDebugOverlay().showDebugScreen()) {
+		if (!cfg.enabled || Mc.isHudHidden(minecraft) || minecraft.getDebugOverlay().showDebugScreen()) {
 			return;
 		}
 

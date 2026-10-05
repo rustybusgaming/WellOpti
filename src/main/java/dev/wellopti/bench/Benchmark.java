@@ -1,5 +1,6 @@
 package dev.wellopti.bench;
 
+import dev.wellopti.compat.Mc;
 import dev.wellopti.WellOptiClient;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.ChatFormatting;
@@ -91,7 +92,7 @@ public final class Benchmark {
 		}
 
 		// Menus and unfocused windows change the frame rate on purpose; numbers taken then would be meaningless.
-		if (phase != Phase.COUNTDOWN && (minecraft.gui.screen() != null || !minecraft.getWindow().isFocused())) {
+		if (phase != Phase.COUNTDOWN && (Mc.screen(minecraft) != null || !minecraft.getWindow().isFocused())) {
 			stop(minecraft, Component.translatable("wellopti.benchmark.cancelled.menu"));
 			return;
 		}
@@ -204,6 +205,6 @@ public final class Benchmark {
 	}
 
 	private static void message(Minecraft minecraft, Component text) {
-		minecraft.gui.hud.getChat().addClientSystemMessage(text);
+		Mc.systemMessage(minecraft, text);
 	}
 }

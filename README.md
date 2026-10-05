@@ -6,7 +6,19 @@ WellOpti skips work your PC doesn't need to do: it doesn't draw things too far a
 it stops particle floods, and it stops rendering at full speed when you aren't looking at the game.
 Everything it does is visual only. The world, farms and redstone behave exactly like vanilla.
 
-**Minecraft 26.3 · Fabric Loader 0.19.5+ · Fabric API · Java 25**
+**Minecraft 26.1 – 26.3 · Fabric Loader 0.19.5+ · Fabric API · Java 25**
+
+## Supported versions
+
+Download the jar that matches your Minecraft version. Each one is built and checked against that exact version.
+
+| Minecraft | Jar |
+| --- | --- |
+| 26.3 | `wellopti-<version>+26.3.jar` |
+| 26.2 | `wellopti-<version>+26.2.jar` |
+| 26.1, 26.1.1, 26.1.2 | `wellopti-<version>+26.1.2.jar` |
+
+Every feature works the same on all of them.
 
 ## What it does
 
@@ -87,7 +99,7 @@ The toggle isn't saved: WellOpti is always on when you start the game.
 
 ## Works with Sodium
 
-WellOpti is tested to load alongside Sodium 0.9.2 for 26.3, with all of both mods' changes applied and no conflicts.
+WellOpti is tested to load alongside Sodium 0.9.2 on 26.1.2, 26.2 and 26.3, with all of both mods' changes applied and no conflicts.
 Sodium makes chunks draw faster; WellOpti decides which entities and block entities are worth drawing at all. The two stack.
 To try it in a dev client: `./gradlew runClient -PwithSodium`.
 
@@ -109,10 +121,18 @@ WellOpti is built to sit alongside the big performance mods, not to replace them
 ## Building
 
 ```sh
-./gradlew build
+./gradlew build                 # Minecraft 26.3 (the default)
+./gradlew build -Pmc=26.2       # any version listed in versions/
+./gradlew buildAllVersions      # every supported version
 ```
 
-The jar is written to `build/libs/wellopti-<version>.jar`. Building needs a Java 25 JDK.
+Jars are written to `build/libs/wellopti-<version>+<minecraft>.jar`. Building needs a Java 25 JDK.
+
+How the multi-version build works: almost all the code is shared in `src/main`. The few bits that differ between
+Minecraft versions (where the game keeps the current screen, the chat and the toasts, and where the per-frame entity pass starts)
+live in small classes under `src/compat/<name>`, and each `versions/<minecraft>.properties` picks its compat folder and its
+Fabric API, Mod Menu and Sodium versions. To add a version, add a properties file, point it at an existing compat folder,
+and only write a new one if it doesn't compile.
 `./gradlew test` runs the unit tests for the occlusion raycaster, the config and the translations.
 
 GitHub Actions builds the jar and runs the tests on every push. Download it from the run's **Artifacts** section.

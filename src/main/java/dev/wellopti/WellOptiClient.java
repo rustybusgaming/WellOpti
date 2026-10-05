@@ -1,5 +1,6 @@
 package dev.wellopti;
 
+import dev.wellopti.compat.Mc;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -81,7 +82,7 @@ public class WellOptiClient implements ClientModInitializer {
 
 		if (openConfigNextTick) {
 			openConfigNextTick = false;
-			minecraft.gui.setScreen(new WellOptiConfigScreen(minecraft.gui.screen()));
+			Mc.setScreen(minecraft, new WellOptiConfigScreen(Mc.screen(minecraft)));
 		}
 	}
 

@@ -7,7 +7,13 @@ on:
 
 jobs:
   build:
+    name: Minecraft ${{ matrix.mc }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Keep in step with supported_versions in gradle.properties.
+        mc: ["26.3", "26.2", "26.1.2"]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,10 +25,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew build -Pmc=${{ matrix.mc }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: wellopti
+          name: wellopti-mc${{ matrix.mc }}
           path: build/libs/*.jar
           if-no-files-found: error

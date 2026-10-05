@@ -7,8 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/** Minecraft 26.2+: the per-frame entity pass lives in LevelExtractor. */
 @Mixin(LevelExtractor.class)
-public abstract class LevelExtractorMixin {
+public abstract class FrameStartMixin {
 	@Inject(method = "extractVisibleEntities", at = @At("HEAD"))
 	private void wellopti$beginEntityPass(CallbackInfo ci) {
 		Culling.beginFrame();

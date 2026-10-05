@@ -78,13 +78,10 @@ public final class Culling {
 		return limit > 0 && WellOptiClient.active && !isPlayer && beyond(distanceToCameraSq, limit);
 	}
 
-	/** Name tag distance for mobs; players keep vanilla's 64 blocks. */
-	public static double nameTagDistance(Entity entity, double vanillaDistance) {
+	/** Shorter name tag distance for mobs; players keep vanilla's 64 blocks. */
+	public static boolean isNameTagTooFar(Entity entity, double distanceToCameraSq) {
 		int limit = WellOptiConfig.get().mobs.nameTagDistance;
-		if (limit <= 0 || !WellOptiClient.active || entity instanceof Player) {
-			return vanillaDistance;
-		}
-		return Math.min(vanillaDistance, limit * AdaptiveDistance.scale());
+		return limit > 0 && WellOptiClient.active && !(entity instanceof Player) && beyond(distanceToCameraSq, limit);
 	}
 
 	public static boolean shouldCullEntity(Entity entity, double camX, double camY, double camZ) {

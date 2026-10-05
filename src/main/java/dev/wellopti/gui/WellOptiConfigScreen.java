@@ -1,5 +1,6 @@
 package dev.wellopti.gui;
 
+import dev.wellopti.compat.Mc;
 import com.mojang.serialization.Codec;
 import dev.wellopti.WellOptiClient;
 import dev.wellopti.bench.Benchmark;
@@ -51,13 +52,13 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 
 		Button benchmark = Button.builder(Component.translatable("wellopti.options.benchmark"), button -> {
 				this.onClose();
-				this.minecraft.gui.setScreen(null);
+				Mc.setScreen(this.minecraft, null);
 				Benchmark.start(this.minecraft);
 			})
 			.tooltip(Tooltip.create(Component.translatable(this.minecraft.level == null ? "wellopti.options.benchmark.needWorld" : "wellopti.options.benchmark.tooltip")))
 			.build();
 		benchmark.active = this.minecraft.level != null && !Benchmark.isRunning();
-		this.list.addBig(benchmark);
+		this.list.addSmall(benchmark, null);
 
 		this.list.addHeader(Component.translatable("wellopti.options.occlusionCulling"));
 		this.list.addBig(toggle("wellopti.options.occlusionCulling.enabled", occlusion.enabled, v -> occlusion.enabled = v));
@@ -160,7 +161,7 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 	/** Applies a preset, then rebuilds the screen so every slider shows its new value. */
 	private void applyPreset(Preset preset) {
 		WellOptiClient.applyPreset(preset);
-		this.minecraft.gui.setScreen(new WellOptiConfigScreen(this.lastScreen));
+		Mc.setScreen(this.minecraft, new WellOptiConfigScreen(this.lastScreen));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dev.wellopti;
 
+import dev.wellopti.compat.Mc;
 import dev.wellopti.config.WellOptiConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -59,6 +60,6 @@ public final class MemoryAdvisor {
 	}
 
 	private static void toast(Minecraft minecraft, Component title, Component message) {
-		SystemToast.addOrUpdate(minecraft.gui.toastManager(), TOAST, title, message);
+		SystemToast.addOrUpdate(Mc.toasts(minecraft), TOAST, title, message);
 	}
 }
