@@ -12,6 +12,9 @@
 	"entrypoints": {
 		"client": [
 			"dev.wellopti.WellOptiClient"
+		],
+		"modmenu": [
+			"dev.wellopti.compat.ModMenuIntegration"
 		]
 	},
 	"depends": {
@@ -25,5 +28,8 @@
 	],
 	"contact": {
 		"sources": "https://github.com/rustybusgaming/WellOpti"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }

@@ -2,6 +2,7 @@ package dev.wellopti.mixin;
 
 import com.mojang.blaze3d.platform.FramerateLimitTracker;
 import com.mojang.blaze3d.platform.Window;
+import dev.wellopti.WellOptiClient;
 import dev.wellopti.config.WellOptiConfig;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
@@ -21,7 +22,7 @@ public abstract class FramerateLimitTrackerMixin {
 	@Inject(method = "getFramerateLimit", at = @At("RETURN"), cancellable = true)
 	private void wellopti$throttleInactiveWindow(CallbackInfoReturnable<Integer> cir) {
 		WellOptiConfig.DynamicFps cfg = WellOptiConfig.get().dynamicFps;
-		if (!cfg.enabled) {
+		if (!cfg.enabled || !WellOptiClient.active) {
 			return;
 		}
 
@@ -31,6 +32,8 @@ public abstract class FramerateLimitTrackerMixin {
 			cir.setReturnValue(Math.min(limit, cfg.minimizedFps));
 		} else if (!window.isFocused()) {
 			cir.setReturnValue(Math.min(limit, cfg.unfocusedFps));
+		} else if (cfg.pausedFps > 0 && this.minecraft.isPaused()) {
+			cir.setReturnValue(Math.min(limit, cfg.pausedFps));
 		}
 	}
 }

@@ -33,6 +33,8 @@ public final class WellOptiConfig {
 		public int unfocusedFps = 30;
 		/** FPS cap while the window is minimised (vanilla uses 10). */
 		public int minimizedFps = 3;
+		/** FPS cap while a singleplayer game is paused. 0 turns this off. */
+		public int pausedFps = 60;
 	}
 
 	public static final class EntityCulling {
@@ -43,6 +45,10 @@ public final class WellOptiConfig {
 		public int experienceOrbs = 32;
 		public int itemFrames = 48;
 		public int armorStands = 64;
+		/** Arrows and tridents stuck in blocks, which pile up around skeleton farms. */
+		public int stuckArrows = 24;
+		/** Bats, fish, tadpoles and squid. */
+		public int ambientMobs = 48;
 	}
 
 	public static final class BlockEntityCulling {
@@ -103,11 +109,14 @@ public final class WellOptiConfig {
 
 		dynamicFps.unfocusedFps = clamp(dynamicFps.unfocusedFps, 1, 260);
 		dynamicFps.minimizedFps = clamp(dynamicFps.minimizedFps, 1, 260);
+		dynamicFps.pausedFps = clamp(dynamicFps.pausedFps, 0, 260);
 
 		entityCulling.droppedItems = clamp(entityCulling.droppedItems, 0, 1024);
 		entityCulling.experienceOrbs = clamp(entityCulling.experienceOrbs, 0, 1024);
 		entityCulling.itemFrames = clamp(entityCulling.itemFrames, 0, 1024);
 		entityCulling.armorStands = clamp(entityCulling.armorStands, 0, 1024);
+		entityCulling.stuckArrows = clamp(entityCulling.stuckArrows, 0, 1024);
+		entityCulling.ambientMobs = clamp(entityCulling.ambientMobs, 0, 1024);
 
 		blockEntityCulling.signText = clamp(blockEntityCulling.signText, 0, 1024);
 		blockEntityCulling.banners = clamp(blockEntityCulling.banners, 0, 1024);

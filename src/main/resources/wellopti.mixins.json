@@ -3,6 +3,7 @@
 	"package": "dev.wellopti.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AbstractArrowAccessor",
 		"BlockEntityRenderDispatcherMixin",
 		"EntityRenderDispatcherMixin",
 		"FramerateLimitTrackerMixin",

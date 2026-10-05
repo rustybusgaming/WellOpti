@@ -1,13 +1,18 @@
 package dev.wellopti;
 
 import dev.wellopti.config.WellOptiConfig;
+import dev.wellopti.mixin.AbstractArrowAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.minecraft.world.entity.animal.fish.AbstractFish;
+import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
@@ -29,7 +34,7 @@ public final class Culling {
 
 	public static boolean shouldCullEntity(Entity entity, double camX, double camY, double camZ) {
 		WellOptiConfig.EntityCulling cfg = WellOptiConfig.get().entityCulling;
-		if (!cfg.enabled) {
+		if (!cfg.enabled || !WellOptiClient.active) {
 			return false;
 		}
 
@@ -48,7 +53,7 @@ public final class Culling {
 
 	public static boolean shouldCullBlockEntity(BlockEntity blockEntity, Vec3 cameraPos) {
 		WellOptiConfig.BlockEntityCulling cfg = WellOptiConfig.get().blockEntityCulling;
-		if (!cfg.enabled || cameraPos == null) {
+		if (!cfg.enabled || !WellOptiClient.active || cameraPos == null) {
 			return false;
 		}
 
@@ -70,6 +75,8 @@ public final class Culling {
 		if (entity instanceof ExperienceOrb) return cfg.experienceOrbs;
 		if (entity instanceof ItemFrame) return cfg.itemFrames;
 		if (entity instanceof ArmorStand) return cfg.armorStands;
+		if (entity instanceof AbstractArrow arrow) return ((AbstractArrowAccessor) arrow).wellopti$isInGround() ? cfg.stuckArrows : 0;
+		if (entity instanceof AmbientCreature || entity instanceof AbstractFish || entity instanceof Squid) return cfg.ambientMobs;
 		return 0;
 	}
 

@@ -1,5 +1,6 @@
 package dev.wellopti.mixin;
 
+import dev.wellopti.WellOptiClient;
 import dev.wellopti.WellOptiStats;
 import dev.wellopti.config.WellOptiConfig;
 import java.util.Map;
@@ -29,7 +30,7 @@ public abstract class ParticleEngineMixin {
 	@Inject(method = "add", at = @At("HEAD"), cancellable = true)
 	private void wellopti$capParticles(Particle particle, CallbackInfo ci) {
 		WellOptiConfig.Particles cfg = WellOptiConfig.get().particles;
-		if (!cfg.enabled || cfg.maxParticles <= 0) {
+		if (!cfg.enabled || !WellOptiClient.active || cfg.maxParticles <= 0) {
 			return;
 		}
 
