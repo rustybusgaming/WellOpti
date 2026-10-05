@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "wellopti",
+	"version": "${version}",
+	"name": "WellOpti",
+	"description": "Client-side performance mod: dynamic FPS, distance culling for decorative entities and block entities, and a particle cap. Makes Minecraft run very goodly.",
+	"authors": [
+		"rustybusgaming"
+	],
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.wellopti.WellOptiClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"mixins": [
+		"wellopti.mixins.json"
+	],
+	"contact": {
+		"sources": "https://github.com/rustybusgaming/WellOpti"
+	}
+}

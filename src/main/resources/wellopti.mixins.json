@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "dev.wellopti.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BlockEntityRenderDispatcherMixin",
+		"EntityRenderDispatcherMixin",
+		"FramerateLimitTrackerMixin",
+		"ParticleEngineMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
