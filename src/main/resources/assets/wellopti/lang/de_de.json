@@ -116,7 +116,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "Anzeigen, wie viel Java-Speicher das Spiel nutzt.",
 	"wellopti.options.hud.showCulling": "Culling anzeigen",
 	"wellopti.options.hud.showCulling.tooltip": "Anzeigen, wie viele Dinge WellOpti pro Bild nicht gezeichnet hat.",
-	"wellopti.options.misc": "Sonstiges",
 	"wellopti.options.memoryAdvisor": "Speicher-Hinweise",
 	"wellopti.options.memoryAdvisor.tooltip": "Einen kurzen Hinweis zeigen, wenn Minecraft sehr wenig Speicher hat oder der Speicher längere Zeit fast voll ist.",
 	"wellopti.memory.low.title": "Minecraft hat wenig Speicher",
@@ -145,5 +144,9 @@
 	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Objekte, die WellOpti nicht zeichnet (hinter Wänden, zu weit weg oder über dem Gedränge-Limit einer Farm), werden bei dir 5-mal pro Sekunde statt 20-mal aktualisiert. Sobald sie wieder sichtbar sind, holen sie auf. Der Server führt jeden Mob ganz normal aus, Farmen und Spielablauf ändern sich also nicht. Spieler, Gerittenes und nahe Objekte werden immer normal aktualisiert.",
 	"wellopti.options.perServerPresets": "Voreinstellung pro Server merken",
 	"wellopti.options.perServerPresets.tooltip": "Wenn du beim Spielen eine Voreinstellung wählst, merkt sich WellOpti sie für diesen Server (Einzelspieler zählt als einer) und wechselt bei jedem Beitritt wieder dorthin.",
-	"wellopti.preset.restored": "WellOpti: Voreinstellung %s für diesen Server aktiv"
+	"wellopti.preset.restored": "WellOpti: Voreinstellung %s für diesen Server aktiv",
+	"wellopti.options.memory": "Speicher",
+	"wellopti.options.memory.cleanOnLeave": "Speicher nach Verlassen freigeben",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "Wenn du eine Welt verlässt, verwirft WellOpti seine Zwischenspeicher und bittet Java, die verlassene Welt freizugeben, während du im Menü bist, wo eine kurze Pause nicht stört. Senkt den Speicherverbrauch zwischen Welten; mehr FPS bringt es nicht.",
+	"wellopti.benchmark.memory": "Speicherumsatz: %s MB/s und %s ms Garbage Collection mit WellOpti; %s MB/s und %s ms ohne (weniger heißt weniger Ruckler)"
 }

@@ -130,7 +130,6 @@
 	"wellopti.options.particles.ambientDistance.tooltip": "Decorative particles (campfire smoke, rain splashes, drips, spores, falling leaves, ash, bubble columns, fireflies) aren't spawned further away than this. Particles that tell you something are never affected.",
 	"wellopti.options.particles.ambientDensity": "Ambient Density",
 	"wellopti.options.particles.ambientDensity.tooltip": "How many decorative particles spawn at all. 100%% is vanilla.",
-	"wellopti.options.misc": "Other",
 	"wellopti.options.memoryAdvisor": "Memory Advisor",
 	"wellopti.options.memoryAdvisor.tooltip": "Show a short notice if Minecraft was given very little memory, or if memory stays nearly full for a while.",
 	"wellopti.memory.low.title": "Minecraft is low on memory",
@@ -145,5 +144,9 @@
 	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Entities WellOpti isn't drawing (behind walls, too far away, or over a farm's crowd limit) update 5 times a second on your screen instead of 20. They catch up the moment they're visible again. The server still runs every mob normally, so farms and gameplay don't change. Players, anything being ridden and nearby entities always update normally.",
 	"wellopti.options.perServerPresets": "Remember Preset Per Server",
 	"wellopti.options.perServerPresets.tooltip": "When you pick a preset while playing, WellOpti remembers it for that server (singleplayer counts as one) and switches back to it whenever you join there again.",
-	"wellopti.preset.restored": "WellOpti: using the %s preset for this server"
+	"wellopti.preset.restored": "WellOpti: using the %s preset for this server",
+	"wellopti.options.memory": "Memory",
+	"wellopti.options.memory.cleanOnLeave": "Free Memory After Leaving",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "After you leave a world, WellOpti drops its own caches and asks Java to free the world you left, while you're on the menu where a short pause doesn't matter. Lowers memory use between worlds; it doesn't raise FPS.",
+	"wellopti.benchmark.memory": "Memory churn: %s MB/s and %s ms of garbage collection with WellOpti; %s MB/s and %s ms without (lower means fewer stutters)"
 }

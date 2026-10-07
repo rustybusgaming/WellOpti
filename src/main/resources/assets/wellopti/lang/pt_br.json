@@ -116,7 +116,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "Mostra quanta memória do Java o jogo está usando.",
 	"wellopti.options.hud.showCulling": "Mostrar culling",
 	"wellopti.options.hud.showCulling.tooltip": "Mostra quantas coisas o WellOpti deixou de desenhar a cada quadro.",
-	"wellopti.options.misc": "Outros",
 	"wellopti.options.memoryAdvisor": "Avisos de memória",
 	"wellopti.options.memoryAdvisor.tooltip": "Mostra um aviso curto se o Minecraft recebeu pouquíssima memória ou se a memória fica quase cheia por um tempo.",
 	"wellopti.memory.low.title": "Minecraft está com pouca memória",
@@ -145,5 +144,9 @@
 	"wellopti.options.entityCulling.throttleHiddenTicks.tooltip": "Entidades que o WellOpti não está desenhando (atrás de paredes, longe demais ou acima do limite de multidão de uma farm) atualizam 5 vezes por segundo na sua tela em vez de 20. Assim que ficam visíveis de novo, elas se atualizam. O servidor continua rodando cada criatura normalmente, então farms e o jogo não mudam. Jogadores, o que alguém está montando e entidades próximas sempre atualizam normalmente.",
 	"wellopti.options.perServerPresets": "Lembrar predefinição por servidor",
 	"wellopti.options.perServerPresets.tooltip": "Quando você escolhe uma predefinição jogando, o WellOpti lembra dela para aquele servidor (o modo um jogador conta como um) e volta a usá-la sempre que você entrar lá.",
-	"wellopti.preset.restored": "WellOpti: usando a predefinição %s neste servidor"
+	"wellopti.preset.restored": "WellOpti: usando a predefinição %s neste servidor",
+	"wellopti.options.memory": "Memória",
+	"wellopti.options.memory.cleanOnLeave": "Liberar memória ao sair",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "Quando você sai de um mundo, o WellOpti descarta os próprios caches e pede ao Java para liberar o mundo que você deixou, enquanto você está no menu, onde uma pausa curta não atrapalha. Reduz o uso de memória entre mundos; não aumenta o FPS.",
+	"wellopti.benchmark.memory": "Uso de memória: %s MB/s e %s ms de coleta de lixo com o WellOpti; %s MB/s e %s ms sem (menos significa menos travadas)"
 }

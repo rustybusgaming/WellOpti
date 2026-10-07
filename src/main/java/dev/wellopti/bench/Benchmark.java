@@ -2,6 +2,7 @@ package dev.wellopti.bench;
 
 import dev.wellopti.compat.Mc;
 import dev.wellopti.WellOptiClient;
+import dev.wellopti.memory.MemoryStats;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,7 +29,8 @@ public final class Benchmark {
 		MEASURE_OFF
 	}
 
-	private record Result(double averageFps, double onePercentLowFps, int frames) {
+	/** allocationMbPerSecond is -1 when the JVM doesn't report allocation. */
+	private record Result(double averageFps, double onePercentLowFps, int frames, double allocationMbPerSecond, long gcMillis) {
 	}
 
 	private static Phase phase = Phase.IDLE;
@@ -134,11 +136,16 @@ public final class Benchmark {
 		}
 	}
 
+	private static long phaseAllocatedStart;
+	private static long phaseGcMillisStart;
+
 	private static void enter(Phase next) {
 		phase = next;
 		phaseStart = System.nanoTime();
 		lastFrame = 0;
 		FRAME_TIMES.clear();
+		phaseAllocatedStart = MemoryStats.totalAllocated();
+		phaseGcMillisStart = MemoryStats.gcMillis();
 	}
 
 	private static void finish() {
@@ -148,9 +155,15 @@ public final class Benchmark {
 	}
 
 	private static Result summarize() {
+		double seconds = (System.nanoTime() - phaseStart) / 1e9;
+		long allocatedNow = MemoryStats.totalAllocated();
+		double allocationMb = allocatedNow < 0 || phaseAllocatedStart < 0 || seconds <= 0
+			? -1 : (allocatedNow - phaseAllocatedStart) / (1024.0 * 1024.0) / seconds;
+		long gcMillis = Math.max(0, MemoryStats.gcMillis() - phaseGcMillisStart);
+
 		int frames = FRAME_TIMES.size();
 		if (frames == 0) {
-			return new Result(0, 0, 0);
+			return new Result(0, 0, 0, allocationMb, gcMillis);
 		}
 
 		long[] times = FRAME_TIMES.toLongArray();
@@ -168,7 +181,7 @@ public final class Benchmark {
 
 		double averageFps = frames * 1e9 / total;
 		double onePercentLowFps = worstCount * 1e9 / worstTotal;
-		return new Result(averageFps, onePercentLowFps, frames);
+		return new Result(averageFps, onePercentLowFps, frames, allocationMb, gcMillis);
 	}
 
 	private static void report(Minecraft minecraft, Result with, Result without) {
@@ -181,8 +194,15 @@ public final class Benchmark {
 				percent(with.averageFps, without.averageFps), percent(with.onePercentLowFps, without.onePercentLowFps)).withStyle(ChatFormatting.YELLOW));
 		}
 
-		WellOptiClient.LOGGER.info("Benchmark: with WellOpti {} avg / {} 1% low ({} frames); without {} avg / {} 1% low ({} frames)",
-			fmt(with.averageFps), fmt(with.onePercentLowFps), with.frames, fmt(without.averageFps), fmt(without.onePercentLowFps), without.frames);
+		if (with.allocationMbPerSecond >= 0 && without.allocationMbPerSecond >= 0) {
+			message(minecraft, Component.translatable("wellopti.benchmark.memory",
+				fmt(with.allocationMbPerSecond), with.gcMillis, fmt(without.allocationMbPerSecond), without.gcMillis).withStyle(ChatFormatting.GRAY));
+		}
+
+		WellOptiClient.LOGGER.info("Benchmark: with WellOpti {} avg / {} 1% low ({} frames, {} MB/s allocated, {} ms GC); "
+				+ "without {} avg / {} 1% low ({} frames, {} MB/s allocated, {} ms GC)",
+			fmt(with.averageFps), fmt(with.onePercentLowFps), with.frames, fmt(with.allocationMbPerSecond), with.gcMillis,
+			fmt(without.averageFps), fmt(without.onePercentLowFps), without.frames, fmt(without.allocationMbPerSecond), without.gcMillis);
 	}
 
 	private static String fmt(double fps) {

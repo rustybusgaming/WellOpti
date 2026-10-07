@@ -42,6 +42,7 @@ the 1.21.x jars run on Java 21.
 | **Adaptive mode** | When FPS drops below your target, all culling distances shrink a little at a time; they grow back once FPS recovers. Good for places that only lag sometimes. On in the Performance and Potato presets. | off, target 60 FPS, shrinks to 50% at most |
 | **Background audio** | Turns the game's volume down while you're in another window or the game is minimised. | off (100%) until you change it |
 | **Performance HUD** | A small corner overlay with FPS, frame time, memory use, and how much WellOpti is skipping each frame. | hidden |
+| **Memory** | WellOpti keeps its own garbage to a minimum (no per-entity, per-frame allocations in its hot paths), shrinks its tables after busy scenes, and frees memory after you leave a world, while you're on the menu. The HUD shows allocation rate and garbage collections, and the benchmark reports memory churn. For deeper memory savings, install FerriteCore alongside. | on |
 | **Memory advisor** | A short notice if Minecraft was given very little memory, or if memory stays nearly full for a while. | on |
 
 Distance culling turns itself off while you're zoomed in with a spyglass, so far-away things are still visible when you look at them on purpose.

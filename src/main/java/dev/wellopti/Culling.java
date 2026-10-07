@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.vault.VaultBlockEntity;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -46,10 +47,23 @@ public final class Culling {
 	private Culling() {
 	}
 
+	/** Drops per-world tables and shrinks them back to their starting size. */
+	public static void clearCaches() {
+		CROWD.clear();
+		CROWD.trim();
+	}
+
 	/** Called at the start of each frame's entity pass. */
 	public static void beginFrame() {
-		CROWD.clear();
+		// Keep the table's capacity between frames (no reallocation), but shrink it if one huge frame bloated it.
+		if (CROWD.size() > 4096) {
+			CROWD.clear();
+			CROWD.trim();
+		} else {
+			CROWD.clear();
+		}
 		TickThrottle.beginFrame();
+		OcclusionCuller.beginFrame();
 	}
 
 	/**
@@ -113,7 +127,11 @@ public final class Culling {
 			return false;
 		}
 
-		if (!beyond(Vec3.atCenterOf(blockEntity.getBlockPos()).distanceToSqr(cameraPos), limit) || (cfg.disableWhileScoping && isScoping())) {
+		BlockPos pos = blockEntity.getBlockPos();
+		double dx = pos.getX() + 0.5 - cameraPos.x;
+		double dy = pos.getY() + 0.5 - cameraPos.y;
+		double dz = pos.getZ() + 0.5 - cameraPos.z;
+		if (!beyond(dx * dx + dy * dy + dz * dz, limit) || (cfg.disableWhileScoping && isScoping())) {
 			return false;
 		}
 
@@ -148,7 +166,7 @@ public final class Culling {
 			return false;
 		}
 
-		return OcclusionCuller.isEntityHidden(entity, level, new Vec3(camX, camY, camZ));
+		return OcclusionCuller.isEntityHidden(entity, level, camX, camY, camZ);
 	}
 
 	public static boolean isBlockEntityOccluded(BlockEntity blockEntity, Vec3 cameraPos) {

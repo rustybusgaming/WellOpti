@@ -125,7 +125,6 @@
 	"wellopti.options.hud.showMemory.tooltip": "Affiche combien de mémoire Java le jeu utilise.",
 	"wellopti.options.hud.showCulling": "Afficher le culling",
 	"wellopti.options.hud.showCulling.tooltip": "Affiche combien d'éléments WellOpti n'a pas dessinés à chaque image.",
-	"wellopti.options.misc": "Autres",
 	"wellopti.options.memoryAdvisor": "Conseils mémoire",
 	"wellopti.options.memoryAdvisor.tooltip": "Affiche un court message si Minecraft a très peu de mémoire, ou si la mémoire reste presque pleine un moment.",
 	"wellopti.memory.low.title": "Minecraft manque de mémoire",
@@ -145,5 +144,9 @@
 	"wellopti.benchmark.noToggle": "Impossible d'activer/désactiver WellOpti pendant un benchmark",
 	"wellopti.benchmark.cancelled.manual": "Benchmark annulé.",
 	"wellopti.benchmark.cancelled.leftWorld": "Benchmark annulé : vous avez quitté le monde.",
-	"wellopti.benchmark.cancelled.menu": "Benchmark annulé : un menu s'est ouvert ou la fenêtre a perdu le focus, ce qui modifie volontairement les FPS. Réessayez en laissant le jeu au premier plan."
+	"wellopti.benchmark.cancelled.menu": "Benchmark annulé : un menu s'est ouvert ou la fenêtre a perdu le focus, ce qui modifie volontairement les FPS. Réessayez en laissant le jeu au premier plan.",
+	"wellopti.options.memory": "Mémoire",
+	"wellopti.options.memory.cleanOnLeave": "Libérer la mémoire en quittant",
+	"wellopti.options.memory.cleanOnLeave.tooltip": "Quand vous quittez un monde, WellOpti vide ses caches et demande à Java de libérer le monde que vous avez quitté, pendant que vous êtes dans le menu, où une courte pause ne gêne pas. Réduit la mémoire utilisée entre deux mondes ; n'augmente pas les FPS.",
+	"wellopti.benchmark.memory": "Activité mémoire : %s Mo/s et %s ms de ramasse-miettes avec WellOpti ; %s Mo/s et %s ms sans (moins = moins de saccades)"
 }

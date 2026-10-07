@@ -2,6 +2,21 @@
 
 All notable changes to WellOpti. Each release's section is used as its release notes on GitHub and Modrinth.
 
+## [1.6.0]
+
+### Added
+- Free memory after leaving a world: WellOpti drops its caches and asks Java to free the world you left while you're on the menu. Lowers memory use between worlds (it doesn't raise FPS). On by default; toggle under Memory in the settings.
+- Memory diagnostics in the performance HUD: allocation rate (how fast new memory is being used up) and garbage collections in the last 10 seconds.
+- The benchmark also reports memory churn and garbage collection time, with and without WellOpti.
+
+### Changed
+- Much less garbage from WellOpti itself, which means fewer garbage collections and the stutters they cause:
+  - The behind-walls checks no longer create objects for every entity on every frame. Their per-frame bookkeeping now lives in primitive tables on the render thread.
+  - The far-mob detail and name tag hooks no longer create a wrapper object for every mob layer on every frame.
+  - The particle cap counts particles once per tick instead of walking every particle group on each spawn.
+  - Block entity distance checks and the HUD text no longer allocate every frame.
+- WellOpti's lookup tables shrink back down after a very busy scene and when you leave a world.
+
 ## [1.5.0]
 
 ### Added

@@ -156,8 +156,11 @@ public class WellOptiConfigScreen extends OptionsSubScreen {
 			toggle("wellopti.options.hud.showCulling", hud.showCulling, v -> hud.showCulling = v)
 		);
 
-		Mc.addHeader(this.list, Component.translatable("wellopti.options.misc"), this.font);
-		this.list.addSmall(toggle("wellopti.options.memoryAdvisor", cfg.memoryAdvisor, v -> cfg.memoryAdvisor = v));
+		Mc.addHeader(this.list, Component.translatable("wellopti.options.memory"), this.font);
+		this.list.addSmall(
+			toggle("wellopti.options.memory.cleanOnLeave", cfg.memory.cleanOnLeave, v -> cfg.memory.cleanOnLeave = v),
+			toggle("wellopti.options.memoryAdvisor", cfg.memoryAdvisor, v -> cfg.memoryAdvisor = v)
+		);
 	}
 
 	/** Applies a preset, then rebuilds the screen so every slider shows its new value. */
